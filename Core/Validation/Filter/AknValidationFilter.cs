@@ -59,8 +59,8 @@ namespace Core.Validation.Filter
 
                 if (validatorResult != null && !validatorResult.IsSucces)
                 {
-                    context.Result = new ObjectResult(validatorResult);
-                    return;
+                    throw new AknException(validatorResult?.Errors);
+                                      
                 }
             }
 

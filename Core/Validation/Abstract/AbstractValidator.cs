@@ -45,13 +45,7 @@ namespace Core.Validation.Abstract
 
                 validationResult.IsSucces = false;
                 validationResult.Message = item.message;
-                validationResult.Errors.Add(new Core.Exception.AknException()
-                {
-                    Message = item.message,
-                    AknExceptionType = Core.Exception.AknExceptionType.VALIDATION,
-                    CreateDate = System.DateTime.Now,
-                    Status = item.returnCode
-                });
+                validationResult.Errors.Add(new Core.Exception.AknExceptionDetail(item.returnCode, item.message, Core.Exception.AknExceptionType.VALIDATION));
                            
             }
 

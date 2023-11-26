@@ -1,4 +1,5 @@
-﻿using Core.Validation.Abstract;
+﻿using Core.Exception;
+using Core.Validation.Abstract;
 using Core.Validation.Concrete;
 using Core.Validation.Extansions;
 using System.Threading.Tasks;
@@ -21,10 +22,10 @@ namespace Template_Api
         }
         public override void ValidateHandle(TestInputObject validate)
         {
-            //_tesResolver.GetError();
+            _tesResolver.GetError();
             RuleFor(x => x.Name != null,"isim boş geçilemez");
             RuleFor(x => x.Id == 3," 3 olmalı");
-            RuleFor(x => x.Name.Length<1, "isim uzunluğu birden küçük olmalı");
+            RuleFor(x => x.Name.Length>5, "isim uzunluğu 5 ten büyük olmalı");
 
 
         }
@@ -46,7 +47,7 @@ namespace Template_Api
     {
         public void GetError()
         {
-            throw new System.NotImplementedException();
+            throw new AknException("GetErrora implemet edilmedi");
         }
     }
 

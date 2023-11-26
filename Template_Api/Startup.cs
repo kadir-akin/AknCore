@@ -1,3 +1,4 @@
+using Core.Exception.Extantions;
 using Core.Validation.Extansions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -37,6 +38,7 @@ namespace Template_Api
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAknExceptionMiddleware();
 
             app.UseEndpoints(endpoints =>
             {
