@@ -14,14 +14,16 @@ namespace Core.Validation.Filter
     public class AknValidationFilter : FilterAttribute, Microsoft.AspNetCore.Mvc.Filters.IActionFilter
     {
         private readonly IValidationContext _validationContext;
+        private readonly IServiceProvider _servicesProvider;
 
-        public AknValidationFilter(IValidationContext validationContext)
+        public AknValidationFilter(IValidationContext validationContext, IServiceProvider services)
         {
             _validationContext = validationContext;
+            _servicesProvider = services;
         }
         public void OnActionExecuted(ActionExecutedContext context)
         {
-        
+
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
@@ -38,14 +40,24 @@ namespace Core.Validation.Filter
 
             if (validatorType != null)
             {
-                validator = (IValidator)Activator.CreateInstance(validatorType);
+                var constractorInfo = validatorType.GetConstructors()?.FirstOrDefault();
+                var parameters = new List<object>();
+               
+                foreach (var param in constractorInfo.GetParameters())
+                {
+                    var service = _servicesProvider.GetService(param.ParameterType);//get instance of the class
+                    parameters.Add(service);
+                }
+
+                validator = (IValidator)Activator.CreateInstance(validatorType, parameters?.ToArray());
+
             }
 
-            if (arguman is IValidateObject validate)
+            if (arguman is IValidateObject validate &&  validator != null)
             {
                 validatorResult = validator.Validate(validate);
 
-                if (validatorResult !=null && !validatorResult.IsSucces )
+                if (validatorResult != null && !validatorResult.IsSucces)
                 {
                     context.Result = new ObjectResult(validatorResult);
                     return;

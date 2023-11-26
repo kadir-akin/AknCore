@@ -23,8 +23,13 @@ namespace Template_Api.Controllers
         {
         }
 
-       
 
+        [HttpPost]
+        public IEnumerable<object> a(TestInputV2 testInputV2)
+        {
+
+            return Summaries;
+        }
         [HttpPost]
         public IEnumerable<object> abc([FromBody]TestInputObject test)
         {

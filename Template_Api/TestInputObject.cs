@@ -14,8 +14,14 @@ namespace Template_Api
 
     public class TestOutputObjectValidator : AbstractValidator<TestInputObject>
     {
+        private readonly ITesResolver _tesResolver;
+        public TestOutputObjectValidator(ITesResolver tesResolver)
+        {
+             _tesResolver = tesResolver;;
+        }
         public override void ValidateHandle(TestInputObject validate)
         {
+            //_tesResolver.GetError();
             RuleFor(x => x.Name != null,"isim boş geçilemez");
             RuleFor(x => x.Id == 3," 3 olmalı");
             RuleFor(x => x.Name.Length<1, "isim uzunluğu birden küçük olmalı");
@@ -28,5 +34,24 @@ namespace Template_Api
         {
             throw new System.NotImplementedException();
         }
+    }
+
+    
+    public interface ITesResolver 
+    {
+        public void GetError();
+    }
+
+    public class TestResolver : ITesResolver
+    {
+        public void GetError()
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
+    public class TestInputV2 
+    {
+        public int Id { get; set; }
     }
 }
