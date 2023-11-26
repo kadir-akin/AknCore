@@ -1,5 +1,6 @@
 ﻿using Core.Validation.Abstract;
 using Core.Validation.Concrete;
+using Core.Validation.Extansions;
 using System.Threading.Tasks;
 
 namespace Template_Api
@@ -13,29 +14,17 @@ namespace Template_Api
 
     public class TestOutputObjectValidator : AbstractValidator<TestInputObject>
     {
-        public override ValidationResult ValidateHandle(TestInputObject validate)
+        public override void ValidateHandle(TestInputObject validate)
         {
-            return new ValidationResult()
-            {
-                IsSucces = false,
-                Message = "Validasyon hatası",
-                Errors = new System.Collections.Generic.List<Core.Exception.AknException>
-                {
-                    new Core.Exception.AknException()
-                    {
-                        Message = "Validasyon Hatası oldu",
-                        AknExceptionType= Core.Exception.AknExceptionType.VALIDATION,
-                        CreateDate=System.DateTime.Now,
-                        Status=400
-                    }
+            RuleFor(x => x.Name != null,"isim boş geçilemez");
+            RuleFor(x => x.Id == 3," 3 olmalı");
+            RuleFor(x => x.Name.Length<1, "isim uzunluğu birden küçük olmalı");
 
-                }
-            };
 
         }
 
 
-        public override Task<ValidationResult> ValidateHandleAsync(TestInputObject validate)
+        public override Task ValidateHandleAsync(TestInputObject validate)
         {
             throw new System.NotImplementedException();
         }

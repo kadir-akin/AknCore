@@ -21,7 +21,7 @@ namespace Core.Validation.Filter
         }
         public void OnActionExecuted(ActionExecutedContext context)
         {
-            throw new NotImplementedException();
+        
         }
 
         public void OnActionExecuting(ActionExecutingContext context)
@@ -47,8 +47,7 @@ namespace Core.Validation.Filter
 
                 if (validatorResult !=null && !validatorResult.IsSucces )
                 {
-
-                    context.Result = new ObjectResult(validatorResult.Errors.FirstOrDefault());
+                    context.Result = new ObjectResult(validatorResult);
                     return;
                 }
             }
