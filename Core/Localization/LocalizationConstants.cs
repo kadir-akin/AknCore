@@ -8,5 +8,6 @@ namespace Core.Localization
     {
         public static string OPERATION_SUCCESS = "OPERATION_SUCCESS";
         public static string GENERAL_ERROR = "GENERAL_ERROR";
+        public static string TEST_LOCALIZE = "TEST_LOCALIZE";
     }
 }

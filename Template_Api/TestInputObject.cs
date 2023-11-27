@@ -1,7 +1,10 @@
 ﻿using Core.Exception;
+using Core.Localization;
+using Core.Localization.Abstract;
 using Core.Validation.Abstract;
 using Core.Validation.Concrete;
 using Core.Validation.Extansions;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Template_Api
@@ -16,16 +19,19 @@ namespace Template_Api
     public class TestOutputObjectValidator : AbstractValidator<TestInputObject>
     {
         private readonly ITesResolver _tesResolver;
-        public TestOutputObjectValidator(ITesResolver tesResolver)
+        private readonly ILocalizationProvider _localizationProvider;
+        public TestOutputObjectValidator(ITesResolver tesResolver, ILocalizationProvider localizationProvider)
         {
-             _tesResolver = tesResolver;;
+             _tesResolver = tesResolver;
+            _localizationProvider = localizationProvider;
         }
         public override void ValidateHandle(TestInputObject validate)
         {
-            _tesResolver.GetError();
-            RuleFor(x => x.Name != null,"isim boş geçilemez");
+
+            //_tesResolver.GetError();
+            RuleFor(x => x.Name.Length > 5, _localizationProvider.GetTranslate(LocalizationConstants.TEST_LOCALIZE,"en-US","Kadir"),2020);
             RuleFor(x => x.Id == 3," 3 olmalı");
-            RuleFor(x => x.Name.Length>5, "isim uzunluğu 5 ten büyük olmalı");
+           
 
 
         }
@@ -53,6 +59,7 @@ namespace Template_Api
 
     public class TestInputV2 
     {
-        public int Id { get; set; }
+        public Dictionary<string,string> DictionaryList { get; set; }
+        public string Culture { get; set; }
     }
 }
