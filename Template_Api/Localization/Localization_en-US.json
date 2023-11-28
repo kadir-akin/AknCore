@@ -3,6 +3,8 @@
   "DictionaryList": {
     "OPERATION_SUCCESS": "Operation Success",
     "GENERAL_ERROR": "Sorry. Please try again.",
-    "TEST_LOCALIZE": "Ms {0} do it."
+    "TEST_LOCALIZE": "Ms {0} do it.",
+    "UNAUTHORIZATION": "UnAuthorization Request",
+    "UNAUTHENTICATION": "Login reguired"
   }
 }

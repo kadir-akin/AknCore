@@ -3,6 +3,8 @@
   "DictionaryList": {
     "OPERATION_SUCCESS": "islem Basarili",
     "GENERAL_ERROR": "Uzgunuz bir sikinti olustu lutfen tekrar deneyiniz.",
-    "TEST_LOCALIZE": "Sayin {0} deneme gerceklecti"
+    "TEST_LOCALIZE": "Sayin {0} deneme gerceklecti",
+    "UNAUTHORIZATION": "Yetkiniz bulunmuyor",
+    "UNAUTHENTICATION": "Giris Yapmalisiniz"
   }
 }

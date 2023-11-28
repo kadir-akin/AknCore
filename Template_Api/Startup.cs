@@ -1,5 +1,8 @@
 using Core.Exception.Extantions;
 using Core.Localization.Extantions;
+using Core.Security.Concrete;
+using Core.Security.Extantions;
+using Core.Security.Filter;
 using Core.Utilities;
 using Core.Validation.Extansions;
 using Microsoft.AspNetCore.Builder;
@@ -26,14 +29,15 @@ namespace Template_Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<ITesResolver, TestResolver>();
-   
+
+            services.AknSecurityDependency(Configuration);
             services.AddAknValidationFilter();
             services.AddControllers();
             // var serviceProvider = services.BuildServiceProvider();
 
             services.AddLocalizationService();
 
-
+          
 
         }
 
@@ -46,8 +50,9 @@ namespace Template_Api
             }
            
             app.UseRouting();
-
             app.UseAuthorization();
+            app.UseAknRequestContextExtantion();
+            app.UseAknAuhenticationExtantion();          
             app.UseAknExceptionMiddleware();
 
             app.UseEndpoints(endpoints =>

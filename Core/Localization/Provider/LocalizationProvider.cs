@@ -36,7 +36,7 @@ namespace Core.Localization.Provider
 
             var translate = dictionary.DictionaryList[key];
 
-            if (args != null) ;
+            if (args != null)
             translate = String.Format(translate, args);
 
             return translate;
