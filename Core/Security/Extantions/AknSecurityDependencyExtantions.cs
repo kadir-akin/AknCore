@@ -18,9 +18,9 @@ namespace Core.Security.Extantions
             services.AddScoped<IAknRequestContext, AknRequestContext>();
 
             var securityConfiguration = _configuration.GetSection("SecurityConfiguration");
-            if (securityConfiguration != null)
+            if (securityConfiguration.Exists())
             {
-                services.Configure<SecurityConfiguration>(x => _configuration.GetSection("SecurityConfiguration"));
+                services.Configure<SecurityConfiguration>("SecurityConfiguration",x=>x.JwtConfiguration=null );
             }
 
             services.AddScoped<IJwtHelper, JwtHelper>();

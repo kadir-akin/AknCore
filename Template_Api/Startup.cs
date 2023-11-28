@@ -36,8 +36,16 @@ namespace Template_Api
             // var serviceProvider = services.BuildServiceProvider();
 
             services.AddLocalizationService();
+           // var securityConfiguration = Configuration.GetSection("SecurityConfiguration");
 
-          
+           // services.Configure<SecurityConfiguration>(Configuration.GetSection("SecurityConfiguration"));
+           //;
+
+           // var c = Configuration.GetSection("SecurityConfiguration");
+           // var a = Configuration.GetValue<string>("abcd");
+           // var b = Configuration.GetValue<SecurityConfiguration>("SecurityConfiguration");
+
+
 
         }
 
@@ -48,11 +56,11 @@ namespace Template_Api
             {
                 app.UseDeveloperExceptionPage();
             }
-           
+
             app.UseRouting();
             app.UseAuthorization();
             app.UseAknRequestContextExtantion();
-            app.UseAknAuhenticationExtantion();          
+            app.UseAknAuhenticationExtantion();
             app.UseAknExceptionMiddleware();
 
             app.UseEndpoints(endpoints =>

@@ -49,6 +49,8 @@ namespace Core.Security.Middleware
 
             if (!string.IsNullOrEmpty(SessionId))
                 _requestContext.SessionId = SessionId;
+            else
+                _requestContext.SessionId = Guid.NewGuid().ToString();
 
             if (!string.IsNullOrEmpty(TransactionId))
                 _requestContext.TransactionId = TransactionId;
