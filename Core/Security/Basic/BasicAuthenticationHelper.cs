@@ -11,17 +11,17 @@ namespace Core.Security.Basic
 {
     public class BasicAuthenticationHelper : IBasicAuthenticationHelper
     {
-        private readonly IOptions<SecurityConfiguration> _securityConfiguration;
-        public BasicAuthenticationHelper(IOptions<SecurityConfiguration> securityConfiguration)
+        private readonly IOptions<BasicAuthConfiguration> _basicAuthConfiguration;
+        public BasicAuthenticationHelper(IOptions<BasicAuthConfiguration> basicAuthConfiguration)
         {
-            _securityConfiguration = securityConfiguration;
+            _basicAuthConfiguration = basicAuthConfiguration;
         }
         public Task<AuthenticationResult> IsAutheticate(IHeaderDictionary header)
         {
-            var basicConfiguration = _securityConfiguration.Value.BasicConfiguration;
+            var basicConfiguration = _basicAuthConfiguration.Value;
             string authorizationValue = header[HeaderConstants.Authorization];
 
-            if (string.IsNullOrEmpty(authorizationValue) || authorizationValue.StartsWith(HeaderConstants.Basic))
+            if (string.IsNullOrEmpty(authorizationValue) || !authorizationValue.StartsWith(HeaderConstants.Basic))
                 return Task.FromResult(new AuthenticationResult(false));
 
             if (basicConfiguration == null || string.IsNullOrEmpty(basicConfiguration.UserName) | string.IsNullOrEmpty(basicConfiguration.Password))
@@ -32,17 +32,22 @@ namespace Core.Security.Basic
             Encoding encoding = Encoding.GetEncoding("iso-8859-1");
             string usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
 
-            int seperatorIndex = usernamePassword.IndexOf(':');
+            int seperatorIndex = usernamePassword.IndexOf("####");
 
-            string username = usernamePassword.Substring(0, seperatorIndex);
-            string password = usernamePassword.Substring(seperatorIndex + 1);
+            if(seperatorIndex<=0)
+                return Task.FromResult(new AuthenticationResult(false));
 
-            if (username == basicConfiguration.UserName && password == basicConfiguration.Password)
+            string[] paramaters= usernamePassword.Split("####");
+            string username = paramaters[0];
+            string password = paramaters[1];
+            string userInfo = paramaters[2];
+           
+            if (!(username == basicConfiguration.UserName && password == basicConfiguration.Password))
             {
                 return Task.FromResult(new AuthenticationResult(false));
             }
 
-            return Task.FromResult(new AuthenticationResult(true));
+            return Task.FromResult(new AuthenticationResult(true,userInfo));
         }
     }
 }

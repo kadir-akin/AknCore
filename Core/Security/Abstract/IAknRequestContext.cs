@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Security.Concrete;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,7 +21,7 @@ namespace Core.Security.Abstract
 
         public string SpanId { get; set; }
 
-        public IAknUser AknUser { get; set; }
+        public AknUser AknUser { get; set; }
 
     }
 }

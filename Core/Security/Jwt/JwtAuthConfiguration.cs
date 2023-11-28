@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Core.Security.Jwt
 {
-    public class JwtConfiguration
+    public class JwtAuthConfiguration
     {
         public string SecretKey { get; set; }
 

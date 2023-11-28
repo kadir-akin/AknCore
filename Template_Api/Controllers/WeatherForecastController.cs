@@ -36,5 +36,12 @@ namespace Template_Api.Controllers
        
             return Summaries;
         }
+
+        [HttpPost]
+        public IEnumerable<object> Login([FromBody] TestInputObject test)
+        {
+
+            return Summaries;
+        }
     }
 }

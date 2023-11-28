@@ -17,40 +17,40 @@ using System.Threading.Tasks;
 
 namespace Core.Security.Middleware
 {
-    public class AknAuthenticationMiddleware
+    public class BasicAuthenticationMiddleware
     {
         private readonly RequestDelegate _next;
 
-        public AknAuthenticationMiddleware( RequestDelegate next)
+        public BasicAuthenticationMiddleware( RequestDelegate next)
         {
             _next = next;
 
         }
-        public async Task InvokeAsync(HttpContext httpContext, IOptions<SecurityConfiguration> _securityConfiguration,
+        public async Task InvokeAsync(HttpContext httpContext, IOptions<BasicAuthConfiguration> _basicAuthConfiguration,
             IBasicAuthenticationHelper _basicAuthenticationHelper,
-            IAknRequestContext _requestContext,
-            IJwtHelper _jwtHelper)
+            IAknRequestContext _requestContext
+            )
         {
-            var jwtConfiguration = _securityConfiguration.Value.JwtConfiguration;
-            var basicConfiguration = _securityConfiguration.Value.BasicConfiguration;
+            
             var headers = httpContext.Request.Headers;
             AuthenticationResult authenticationResult = new AuthenticationResult(false);
+            var path = httpContext.Request.Path.ToString();
+            var isIgnoreEndpoind = path.Contains(HeaderConstants.IgnoreEndpoindName) || path.Contains("startup");
 
-            if (basicConfiguration != null)
+            if (_basicAuthConfiguration.Value != null && !isIgnoreEndpoind)
             {
                 authenticationResult = await _basicAuthenticationHelper.IsAutheticate(headers);
+                
+                if (authenticationResult.IsSuccess) 
+                {
+                    var user = JsonConvert.DeserializeObject<AknUser>((string)authenticationResult.Data);
+                    _requestContext.AknUser = user;
+                }
             }
-            else if (jwtConfiguration != null)
-            {
-                authenticationResult = await _jwtHelper.IsAutheticate(headers);
-            }
-            else
-            {
-                authenticationResult.IsSuccess = false;
-            }
+            
 
 
-            if (authenticationResult == null || !authenticationResult.IsSuccess) 
+            if (!authenticationResult.IsSuccess && !isIgnoreEndpoind) 
             { 
                 var aknException = new UnAuthenticationException();
                 var resulModel = new ErrorResult<List<AknExceptionDetail>>(aknException.ExceptionDetailList, aknException.ExceptionDetailList.FirstOrDefault().Status, aknException.ExceptionDetailList.FirstOrDefault().Message);

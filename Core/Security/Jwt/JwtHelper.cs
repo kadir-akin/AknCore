@@ -19,8 +19,8 @@ namespace Core.Security.Jwt
         public const string Audience = "tazi.tech";
         public const string Issuer = "tazi.tech";
 
-        private readonly IOptions<SecurityConfiguration> _securityConfiguration;
-        public JwtHelper(IOptions<SecurityConfiguration> securityConfiguration)
+        private readonly IOptions<JwtAuthConfiguration> _securityConfiguration;
+        public JwtHelper(IOptions<JwtAuthConfiguration> securityConfiguration)
         {
             _securityConfiguration = securityConfiguration;
         }

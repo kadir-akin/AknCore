@@ -1,5 +1,7 @@
 using Core.Exception.Extantions;
+using Core.Infrastructure.Extantions;
 using Core.Localization.Extantions;
+using Core.Security.Basic;
 using Core.Security.Concrete;
 using Core.Security.Extantions;
 using Core.Security.Filter;
@@ -20,33 +22,30 @@ namespace Template_Api
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration _configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddScoped<ITesResolver, TestResolver>();
 
-            services.AknSecurityDependency(Configuration);
+
+            services.AddReqeustContextDependency();
+            services.AddBasicAuthDependency();
+           
+            var basicAuthConfiguration = _configuration.GetSection("BasicAuthConfiguration");
+            if (basicAuthConfiguration.Exists())
+            {
+                services.Configure<BasicAuthConfiguration>(basicAuthConfiguration);
+            }
             services.AddAknValidationFilter();
             services.AddControllers();
             // var serviceProvider = services.BuildServiceProvider();
 
             services.AddLocalizationService();
-           // var securityConfiguration = Configuration.GetSection("SecurityConfiguration");
-
-           // services.Configure<SecurityConfiguration>(Configuration.GetSection("SecurityConfiguration"));
-           //;
-
-           // var c = Configuration.GetSection("SecurityConfiguration");
-           // var a = Configuration.GetValue<string>("abcd");
-           // var b = Configuration.GetValue<SecurityConfiguration>("SecurityConfiguration");
-
-
-
+         
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -60,7 +59,7 @@ namespace Template_Api
             app.UseRouting();
             app.UseAuthorization();
             app.UseAknRequestContextExtantion();
-            app.UseAknAuhenticationExtantion();
+            app.UseBasicAuth();
             app.UseAknExceptionMiddleware();
 
             app.UseEndpoints(endpoints =>
