@@ -14,17 +14,11 @@ namespace Core.Security.Middleware
     public class AknRequestContextMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IAknRequestContext _requestContext;
-        public AknRequestContextMiddleware
-            (
-            RequestDelegate next,
-            IAknRequestContext requestContext
-            )
+        public AknRequestContextMiddleware( RequestDelegate next )
         {
-            _next = next;
-            _requestContext = requestContext;
+            _next = next;       
         }
-        public async Task InvokeAsync(HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext httpContext, IAknRequestContext _requestContext)
         {           
             var headers = httpContext.Request.Headers;
             var CountryId= headers[HeaderConstants.CountryId];

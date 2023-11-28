@@ -1,4 +1,6 @@
-﻿using Core.Exception.Exceptions;
+﻿using Core.Exception;
+using Core.Exception.Exceptions;
+using Core.ResultModel;
 using Core.Security.Abstract;
 using Core.Security.Basic;
 using Core.Security.Concrete;
@@ -6,8 +8,10 @@ using Core.Security.Jwt;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,35 +20,25 @@ namespace Core.Security.Middleware
     public class AknAuthenticationMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IOptions<SecurityConfiguration> _securityConfiguration;
-        private readonly IBasicAuthenticationHelper _basicAuthenticationHelper;
-        private readonly IJwtHelper _jwtHelper;
-        private readonly IAknRequestContext  _requestContext;
-        public AknAuthenticationMiddleware
-            (
-            RequestDelegate next,
-            IOptions<SecurityConfiguration> securityConfiguration,
-            IBasicAuthenticationHelper basicAuthenticationHelper,
-            IAknRequestContext requestContext,
-            IJwtHelper jwtHelper
-            )
+
+        public AknAuthenticationMiddleware( RequestDelegate next)
         {
             _next = next;
-            _securityConfiguration = securityConfiguration;
-            _basicAuthenticationHelper = basicAuthenticationHelper;
-            _requestContext = requestContext;
-            _jwtHelper = jwtHelper;
+
         }
-        public async Task InvokeAsync(HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext httpContext, IOptions<SecurityConfiguration> _securityConfiguration,
+            IBasicAuthenticationHelper _basicAuthenticationHelper,
+            IAknRequestContext _requestContext,
+            IJwtHelper _jwtHelper)
         {
             var jwtConfiguration = _securityConfiguration.Value.JwtConfiguration;
-            var basicConfiguration =_securityConfiguration.Value.BasicConfiguration;
+            var basicConfiguration = _securityConfiguration.Value.BasicConfiguration;
             var headers = httpContext.Request.Headers;
-            AuthenticationResult authenticationResult = null;
+            AuthenticationResult authenticationResult = new AuthenticationResult(false);
 
-            if (basicConfiguration !=null)
+            if (basicConfiguration != null)
             {
-                authenticationResult =await _basicAuthenticationHelper.IsAutheticate( headers);
+                authenticationResult = await _basicAuthenticationHelper.IsAutheticate(headers);
             }
             else if (jwtConfiguration != null)
             {
@@ -52,12 +46,19 @@ namespace Core.Security.Middleware
             }
             else
             {
-                throw new UnAuthenticationException();
+                authenticationResult.IsSuccess = false;
             }
 
 
-            if (authenticationResult ==null || !authenticationResult.IsSuccess)
-                throw new UnAuthenticationException();
+            if (authenticationResult == null || !authenticationResult.IsSuccess) 
+            { 
+                var aknException = new UnAuthenticationException();
+                var resulModel = new ErrorResult<List<AknExceptionDetail>>(aknException.ExceptionDetailList, aknException.ExceptionDetailList.FirstOrDefault().Status, aknException.ExceptionDetailList.FirstOrDefault().Message);
+
+                httpContext.Response.ContentType = "application/json";
+                await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(resulModel));
+            
+            }
 
 
             await _next(httpContext);
