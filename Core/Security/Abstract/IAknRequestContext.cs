@@ -21,7 +21,6 @@ namespace Core.Security.Abstract
 
         public string SpanId { get; set; }
 
-        public AknUser AknUser { get; set; }
 
     }
 }

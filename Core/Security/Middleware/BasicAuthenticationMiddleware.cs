@@ -5,6 +5,7 @@ using Core.Security.Abstract;
 using Core.Security.Basic;
 using Core.Security.Concrete;
 using Core.Security.Jwt;
+using Core.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -28,7 +29,8 @@ namespace Core.Security.Middleware
         }
         public async Task InvokeAsync(HttpContext httpContext, IOptions<BasicAuthConfiguration> _basicAuthConfiguration,
             IBasicAuthenticationHelper _basicAuthenticationHelper,
-            IAknRequestContext _requestContext
+            IAknUser _aknUser,
+            IAknUserImplementClasses _aknUserImplementClasses
             )
         {
             
@@ -43,8 +45,9 @@ namespace Core.Security.Middleware
                 
                 if (authenticationResult.IsSuccess) 
                 {
-                    var user = JsonConvert.DeserializeObject<AknUser>((string)authenticationResult.Data);
-                    _requestContext.AknUser = user;
+                    var user = JsonConvert.DeserializeObject<IAknUser>((string)authenticationResult.Data, AknUserJsonConvertor.GetJsonSerializerSettings(_aknUserImplementClasses.ImplementTypes.FirstOrDefault()));
+                    _aknUser= user;
+                    
                 }
             }
             

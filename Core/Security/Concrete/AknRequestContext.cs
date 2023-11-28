@@ -21,6 +21,5 @@ namespace Core.Security.Concrete
 
         public string SpanId { get; set; }
 
-        public AknUser AknUser { get; set; }
     }
 }

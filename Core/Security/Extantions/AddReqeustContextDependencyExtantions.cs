@@ -12,7 +12,7 @@ namespace Core.Infrastructure.Extantions
     {
         public static IServiceCollection AddReqeustContextDependency(this IServiceCollection services)
         {
-            services.AddScoped<IAknUser, AknUser>();
+           
             services.AddScoped<IAknRequestContext, AknRequestContext>();
             return services;
         }
