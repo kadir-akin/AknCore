@@ -13,9 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Log\Abstract\" />
-    <Folder Include="Log\Concrate\" />
-    <Folder Include="Log\Provider\" />
+    <Folder Include="LogAkn\Abstract\" />
+    <Folder Include="LogAkn\Concrate\" />
+    <Folder Include="LogAkn\Provider\" />
   </ItemGroup>
 
 </Project>
