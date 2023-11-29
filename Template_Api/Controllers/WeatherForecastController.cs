@@ -1,4 +1,5 @@
-﻿using Core.Security.Abstract;
+﻿using Core.Elastic.Abstract;
+using Core.Security.Abstract;
 using Core.Security.Filter;
 using Core.Utilities;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +20,10 @@ namespace Template_Api.Controllers
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
-
-        public WeatherForecastController()
+        private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
+        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider)
         {
+            _elasticSearchProvider = elasticSearchProvider;
         }
 
 
@@ -33,10 +35,20 @@ namespace Template_Api.Controllers
         }
         [HttpPost]
         [AknAuthorizationFilter("TESTROLE")]
-        public IEnumerable<object> abc([FromBody]TestInputObject test)
+        public async Task<object> abc([FromBody] TestInputObject test)
         {
             var userhttpContext = HttpContext.User;
             var threadUser = AknUserUtilities.GetCurrentUser();
+            //await _elasticSearchProvider.ChekIndex();
+            //var id = Guid.NewGuid().ToString();
+            //await _elasticSearchProvider.InsertDocument(new ElasticSearchTestobject()
+            //{
+            //    Code = "500",
+            //    Id = id,
+            //    Message = "test message"
+            //});
+            //var index = await _elasticSearchProvider.GetDocument(id);
+
             return Summaries;
         }
 

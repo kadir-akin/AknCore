@@ -1,3 +1,5 @@
+using Core.Elastic.Abstract;
+using Core.Elastic.Concrate;
 using Core.Exception.Extantions;
 using Core.Infrastructure.Extantions;
 using Core.Localization.Extantions;
@@ -40,6 +42,13 @@ namespace Template_Api
             {
                 services.Configure<BasicAuthConfiguration>(basicAuthConfiguration);
             }
+
+            var elasticConfig = _configuration.GetSection("ElasticSearchConfiguration");
+            if (elasticConfig.Exists())
+            {
+                services.Configure<ElasticSearchConfiguration>(elasticConfig);
+            }
+            services.AddScoped(typeof(IElasticSearchProvider<>),typeof(ElasticSearchProvider<>));
             services.AddAknValidationFilter();
             services.AddControllers();
             // var serviceProvider = services.BuildServiceProvider();
