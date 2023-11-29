@@ -13,7 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Logger\" />
+    <Folder Include="Log\Abstract\" />
+    <Folder Include="Log\Concrate\" />
+    <Folder Include="Log\Provider\" />
   </ItemGroup>
 
 </Project>
