@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,8 +48,8 @@ namespace Core.Security.Middleware
                 {
                     var user = JsonConvert.DeserializeObject<IAknUser>((string)authenticationResult.Data, AknUserJsonConvertor.GetJsonSerializerSettings(_aknUserImplementClasses.ImplementTypes.FirstOrDefault()));
                     _aknUser= user;
-                    
-                    
+                    httpContext.User = _aknUser.SetCurrentUser();
+                  
                 }
             }
             
