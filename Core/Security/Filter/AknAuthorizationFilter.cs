@@ -8,11 +8,10 @@ namespace Core.Security.Filter
 {
     public class AknAuthorizationFilter : FilterAttribute, Microsoft.AspNetCore.Mvc.Filters.IActionFilter
     {
-        private readonly AuthotanticationType _authotanticationType;
+        
         private readonly string _roles;
-        public AknAuthorizationFilter(AuthotanticationType authotanticationType,string roles=null)
-        {
-            _authotanticationType = authotanticationType;
+        public AknAuthorizationFilter(string roles=null)
+        {           
             _roles = roles;
         }
         public void OnActionExecuted(ActionExecutedContext context)
@@ -22,19 +21,9 @@ namespace Core.Security.Filter
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var headers =context.HttpContext.Request.Headers;
+            
 
-            if (headers == null)
-                throw new UnAuthenticationException();
-
-            if (_authotanticationType==AuthotanticationType.JWT)
-            {
-
-            }
-            else
-            {
-
-            }
+            
 
         }
     }

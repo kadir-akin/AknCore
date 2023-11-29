@@ -48,6 +48,7 @@ namespace Core.Security.Middleware
                     var user = JsonConvert.DeserializeObject<IAknUser>((string)authenticationResult.Data, AknUserJsonConvertor.GetJsonSerializerSettings(_aknUserImplementClasses.ImplementTypes.FirstOrDefault()));
                     _aknUser= user;
                     
+                    
                 }
             }
             
