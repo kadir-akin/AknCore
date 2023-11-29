@@ -48,21 +48,17 @@ namespace Core.Security.Middleware
                 {
                     var user = JsonConvert.DeserializeObject<IAknUser>((string)authenticationResult.Data, AknUserJsonConvertor.GetJsonSerializerSettings(_aknUserImplementClasses.ImplementTypes.FirstOrDefault()));
                     _aknUser= user;
-                    httpContext.User = _aknUser?.SetCurrentUser();
-                  
+                    httpContext.User = _aknUser?.SetCurrentUser();                  
                 }
             }
             
-
-
             if (!authenticationResult.IsSuccess && !isIgnoreEndpoind) 
             { 
                 var aknException = new UnAuthenticationException();
                 var resulModel = new ErrorResult<List<AknExceptionDetail>>(aknException.ExceptionDetailList, aknException.ExceptionDetailList.FirstOrDefault().Status, aknException.ExceptionDetailList.FirstOrDefault().Message);
 
                 httpContext.Response.ContentType = "application/json";
-                await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(resulModel));
-            
+                await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(resulModel));            
             }
 
 

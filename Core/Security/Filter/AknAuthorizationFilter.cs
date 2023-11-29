@@ -23,8 +23,6 @@ namespace Core.Security.Filter
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-
-
             var userRoles = AknUserUtilities.GetCurrentUserRoles();
             bool isAuthorized = false;
 
@@ -35,7 +33,6 @@ namespace Core.Security.Filter
                     isAuthorized = true;
                     break;
                 }
-
             }
 
             if (!isAuthorized)
