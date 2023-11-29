@@ -12,10 +12,4 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="LogAkn\Abstract\" />
-    <Folder Include="LogAkn\Concrate\" />
-    <Folder Include="LogAkn\Provider\" />
-  </ItemGroup>
-
 </Project>
