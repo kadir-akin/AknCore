@@ -36,10 +36,7 @@ namespace Core.Utilities
                 return null; 
 
             var claimIdentity = new ClaimsIdentity();
-
             var type = aknUser.GetType();
-
-
             foreach (var item in type.GetProperties())
             {
                 var value = item.GetValue(aknUser);
@@ -49,7 +46,6 @@ namespace Core.Utilities
                 }
 
             }
-
             return claimIdentity;
         }
 
