@@ -31,7 +31,7 @@ namespace Core.LogAkn.Abstract
 
         public string LogLevel { get; set; }
 
-      
+        public string Query { get; set; }
 
 
     }
