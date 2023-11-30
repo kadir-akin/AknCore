@@ -33,14 +33,14 @@ namespace Core.LogAkn.Concrate
             User = user;
             ProjectName = projectInfo?.ProjectName;
             ApplicationName = projectInfo?.ApplicationName;
-            StatusCode = httpContext.HttpContext.Response.StatusCode;
-            ReturnCode = httpContext.HttpContext.Response.StatusCode;
+            StatusCode = httpContext.HttpContext ==null ?  ((int)HttpStatusCode.OK) :httpContext.HttpContext.Response.StatusCode;
+            ReturnCode = httpContext.HttpContext == null ? ((int)HttpStatusCode.OK) : httpContext.HttpContext.Response.StatusCode;
             Message = message;
-            CreateDate = DateTime.Now.ToString("yyyy'-'MM'-'dd''HH':'mm':'ss");
+            CreateDate = DateTime.Now.ToString("yyyy'-'MM'-'dd' 'HH':'mm':'ss");
             Exception = exception;
-            ActionPath = httpContext != null ? httpContext.HttpContext.Request.Path : null;
+            ActionPath = httpContext.HttpContext != null ? httpContext.HttpContext.Request.Path : null;
             LogLevel = logLevel;
-            Query = httpContext != null ? httpContext.HttpContext.Request.QueryString.Value : null;
+            Query = httpContext.HttpContext != null ? httpContext.HttpContext.Request.QueryString.Value : null;
             Id = Guid.NewGuid().ToString();
         }
 
