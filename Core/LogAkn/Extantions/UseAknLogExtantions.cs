@@ -1,4 +1,5 @@
 ﻿using Core.Elastic.Abstract;
+using Core.LogAkn.Abstract;
 using Core.LogAkn.Concrate;
 using Core.LogAkn.LoggerProvider;
 using Core.RequestContext.Concrate;
@@ -16,7 +17,7 @@ namespace Core.LogAkn.Extantions
 {
     public static class UseAknLogExtantions
     {
-        public static void UseAknLogProvider(this IApplicationBuilder app, IAknUser _user, IAknRequestContext _requestContext, IElasticSearchProvider<RequestContextLog> _elasticSearchprovider)
+        public static void UseAknLogProvider(this IApplicationBuilder app, IDebugLoggerProvider   _debugLoggerProvider, IElasticLoggerProvider  elasticLoggerProvider)
         {
             var services = app.ApplicationServices;
             var projectInfo = (IOptions<ProjectInfoConfiguration>)services.GetService(typeof(IOptions<ProjectInfoConfiguration>));
@@ -31,12 +32,13 @@ namespace Core.LogAkn.Extantions
                                
                 if (logConfig.Value.EnableElasticLogProvider)
                 {                   
-                    _loggerFactory.AddProvider(new ElasticLoggerProvider(_hostingEnvironment, projectInfo, _httpContextAccessor, _requestContext, _user, _elasticSearchprovider));
+                    _loggerFactory.AddProvider(elasticLoggerProvider);
+                    
                 }
 
                 if (logConfig.Value.EnableDebugLogProvider)
                 {
-                    _loggerFactory.AddProvider(new DebugLoggerProvider(_hostingEnvironment, projectInfo, _httpContextAccessor, _requestContext, _user));
+                    _loggerFactory.AddProvider(_debugLoggerProvider);
                 }
 
             }

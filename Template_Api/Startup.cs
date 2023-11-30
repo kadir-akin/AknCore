@@ -4,6 +4,7 @@ using Core.Elastic.Extantions;
 using Core.Exception.Extantions;
 using Core.Infrastructure.Extantions;
 using Core.Localization.Extantions;
+using Core.LogAkn.Abstract;
 using Core.LogAkn.Concrate;
 using Core.LogAkn.Extantions;
 using Core.RequestContext.Concrate;
@@ -74,7 +75,7 @@ namespace Template_Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IAknUser user, IAknRequestContext _requestContext, IElasticSearchProvider<RequestContextLog> _elasticSearchprovider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDebugLoggerProvider _debugLoggerProvider, IElasticLoggerProvider elasticLoggerProvider)
         {
             if (env.IsDevelopment())
             {
@@ -86,7 +87,7 @@ namespace Template_Api
             app.UseAknExceptionMiddleware();
             app.UseAknRequestContextExtantion();
             app.UseBasicAuth();
-            app.UseAknLogProvider(user,_requestContext,_elasticSearchprovider);
+            app.UseAknLogProvider( _debugLoggerProvider, elasticLoggerProvider);
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

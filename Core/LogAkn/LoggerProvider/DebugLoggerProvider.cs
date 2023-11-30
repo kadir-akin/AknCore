@@ -1,4 +1,5 @@
-﻿using Core.LogAkn.Concrate;
+﻿using Core.LogAkn.Abstract;
+using Core.LogAkn.Concrate;
 using Core.LogAkn.LoggerAkn;
 using Core.RequestContext.Concrate;
 using Core.Security.Abstract;
@@ -12,13 +13,14 @@ using System.Text;
 
 namespace Core.LogAkn.LoggerProvider
 {
-    public class DebugLoggerProvider : ILoggerProvider
+    public class DebugLoggerProvider : IDebugLoggerProvider
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IOptions<ProjectInfoConfiguration> _projectInfoConfiguration;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IAknRequestContext _requestContext;
         private readonly IAknUser _user;
+        private readonly List<DebugLogger> debugLoggerProviders = new List<DebugLogger>();
         public DebugLoggerProvider(
             IHostingEnvironment hostingEnvironment,
             IOptions<ProjectInfoConfiguration> projectInfoConfiguration,
@@ -34,8 +36,13 @@ namespace Core.LogAkn.LoggerProvider
             _user = user;
 
         }
-        public ILogger CreateLogger(string categoryName) => new DebugLogger(_hostingEnvironment,_projectInfoConfiguration,_httpContext,_requestContext,_user);
-        public void Dispose() => throw new NotImplementedException();
+        public ILogger CreateLogger(string categoryName)
+        {
+            var logger = new DebugLogger(_hostingEnvironment, _projectInfoConfiguration, _httpContext, _requestContext, _user);
+            debugLoggerProviders.Add(logger);
+            return logger;
+        }
+        public void Dispose() => debugLoggerProviders.Clear();
     }
 
 }

@@ -1,4 +1,5 @@
 ﻿using Core.Elastic.Abstract;
+using Core.LogAkn.Abstract;
 using Core.LogAkn.Concrate;
 using Core.LogAkn.LoggerProvider;
 using Core.RequestContext.Concrate;
@@ -35,12 +36,23 @@ namespace Core.LogAkn.Extantions
             if (projectInfo.Value.EnableLog)
             {
                 var logConfigurationsection = _configuration.GetSection("LogConfiguration");
+                var logInfo = services.BuildServiceProvider().GetService<IOptions<LogConfiguration>>();
 
                 if (logConfigurationsection.Exists())
                     Console.WriteLine("implement edilmeli"); //services.Configure<LogConfiguration>(logConfigurationsection);
                 else
                     throw new System.Exception("LogConfiguration not found");
-               
+
+                if (logInfo.Value.EnableElasticLogProvider)
+                {
+                    services.AddScoped<IElasticLoggerProvider, ElasticLoggerProvider>();
+                }
+
+                if (logInfo.Value.EnableDebugLogProvider)
+                {
+                    services.AddScoped<IDebugLoggerProvider, DebugLoggerProvider>();
+                }
+
             }
 
 
