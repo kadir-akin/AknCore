@@ -1,5 +1,6 @@
 ﻿using Core.Elastic.Abstract;
 using Core.LogAkn.Concrate;
+using Core.LogAkn.LoggerAkn;
 using Core.RequestContext.Concrate;
 using Core.Security.Abstract;
 using Microsoft.AspNetCore.Hosting;
@@ -10,9 +11,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.LogAkn.LoggerAkn
+namespace Core.LogAkn.LoggerProvider
 {
-    internal class ElasticLogger :ILogger
+    public class ElasticLoggerProvider
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IOptions<ProjectInfoConfiguration> _projectInfoConfiguration;
@@ -20,7 +21,7 @@ namespace Core.LogAkn.LoggerAkn
         private readonly IAknRequestContext _requestContext;
         private readonly IAknUser _user;
         private readonly IElasticSearchProvider<RequestContextLog> _elasticSearchProvider;
-        public ElasticLogger(
+        public ElasticLoggerProvider(
             IHostingEnvironment hostingEnvironment,
             IOptions<ProjectInfoConfiguration> projectInfoConfiguration,
             HttpContext httpContext,
@@ -35,15 +36,9 @@ namespace Core.LogAkn.LoggerAkn
             _requestContext = requestContext;
             _user = user;
             _elasticSearchProvider = elasticSearchProvider;
-            _elasticSearchProvider.ChekIndex().GetAwaiter().GetResult();
-        }
 
-        public IDisposable BeginScope<TState>(TState state) => null;
-        public bool IsEnabled(LogLevel logLevel) => true;
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, System.Exception exception, Func<TState, System.Exception, string> formatter)
-        {
-            var log = new RequestContextLog(formatter(state, exception), logLevel.ToString(), _httpContext, exception, _requestContext, _user, _projectInfoConfiguration.Value);
-            _elasticSearchProvider.InsertDocument(log);
         }
+        public ILogger CreateLogger(string categoryName) => new ElasticLogger(_hostingEnvironment, _projectInfoConfiguration, _httpContext, _requestContext, _user,_elasticSearchProvider);
+        public void Dispose() => throw new NotImplementedException();
     }
 }
