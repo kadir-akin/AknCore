@@ -4,6 +4,9 @@ using Core.Elastic.Extantions;
 using Core.Exception.Extantions;
 using Core.Infrastructure.Extantions;
 using Core.Localization.Extantions;
+using Core.LogAkn.Concrate;
+using Core.LogAkn.Extantions;
+using Core.RequestContext.Concrate;
 using Core.Security.Basic;
 using Core.Security.Concrete;
 using Core.Security.Extantions;
@@ -45,6 +48,7 @@ namespace Template_Api
             }
 
             var elasticConfig = _configuration.GetSection("ElasticSearchConfiguration");
+           
             services.Configure<ElasticSearchConfiguration>(elasticConfig);
             services.AddElasticSearch();
 
@@ -53,7 +57,19 @@ namespace Template_Api
             // var serviceProvider = services.BuildServiceProvider();
 
             services.AddLocalizationService();
+            
+            var projectInfoConfiguration = _configuration.GetSection("ProjectInfoConfiguration");
 
+            if (projectInfoConfiguration.Exists())
+               services.Configure<ProjectInfoConfiguration>(projectInfoConfiguration);
+            
+            
+            var logConfigurationsection = _configuration.GetSection("LogConfiguration");
+
+            if (logConfigurationsection.Exists())
+               services.Configure<LogConfiguration>(logConfigurationsection);
+
+            services.AddAknLogDependency();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

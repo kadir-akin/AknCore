@@ -27,20 +27,20 @@ namespace Core.LogAkn.Concrate
         public string Query { get; set; }
         public string Id { get; set; }
 
-        public RequestContextLog(string message, string logLevel, HttpContext httpContext, System.Exception exception, IAknRequestContext requestContext, IAknUser user, ProjectInfoConfiguration projectInfo)
+        public RequestContextLog(string message, string logLevel, IHttpContextAccessor httpContext, System.Exception exception, IAknRequestContext requestContext, IAknUser user, ProjectInfoConfiguration projectInfo)
         {
             RequestContext = requestContext;
             User = user;
             ProjectName = projectInfo?.ProjectName;
             ApplicationName = projectInfo?.ApplicationName;
-            StatusCode = httpContext.Response.StatusCode;
-            ReturnCode = httpContext.Response.StatusCode;
+            StatusCode = httpContext.HttpContext.Response.StatusCode;
+            ReturnCode = httpContext.HttpContext.Response.StatusCode;
             Message = message;
             CreateDate = DateTime.Now.ToString("yyyy'-'MM'-'dd''HH':'mm':'ss");
             Exception = exception;
-            ActionPath = httpContext != null ? httpContext.Request.Path : null;
+            ActionPath = httpContext != null ? httpContext.HttpContext.Request.Path : null;
             LogLevel = logLevel;
-            Query = httpContext != null ? httpContext.Request.QueryString.Value : null;
+            Query = httpContext != null ? httpContext.HttpContext.Request.QueryString.Value : null;
             Id = Guid.NewGuid().ToString();
         }
 

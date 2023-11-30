@@ -16,14 +16,14 @@ namespace Core.LogAkn.LoggerAkn
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IOptions<ProjectInfoConfiguration> _projectInfoConfiguration;
-        private readonly HttpContext _httpContext;
+        private readonly IHttpContextAccessor _httpContext;
         private readonly IAknRequestContext _requestContext;
         private readonly IAknUser _user;
         private readonly IElasticSearchProvider<RequestContextLog> _elasticSearchProvider;
         public ElasticLogger(
             IHostingEnvironment hostingEnvironment,
             IOptions<ProjectInfoConfiguration> projectInfoConfiguration,
-            HttpContext httpContext,
+            IHttpContextAccessor httpContext,
             IAknRequestContext requestContext,
             IAknUser user,
             IElasticSearchProvider<RequestContextLog> elasticSearchProvider
