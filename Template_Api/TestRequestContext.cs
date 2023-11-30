@@ -4,6 +4,7 @@ namespace Template_Api
 {
     public class TestRequestContext : IAknRequestContext
     {
+        public int TestValue { get; set; }
         public int CountryId { get; set; }
         public int RegionId { get; set; }
         public string CultureCode { get; set; }

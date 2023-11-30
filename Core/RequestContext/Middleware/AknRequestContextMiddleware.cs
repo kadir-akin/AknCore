@@ -65,17 +65,18 @@ namespace Core.Security.Middleware
             else
                 _requestContext.SpanId = Guid.NewGuid().ToString();
 
+
+
             var otherProperties = _implementTypes.ImplementTypes.FirstOrDefault()?.GetProperties();
 
-             
-
             foreach (var item in otherProperties)
-            {
-                var itemvalue = item.GetValue(_requestContext);
+            {               
+                var headersValue = headers[item.Name];
                
-                if (!_implementTypes.InterfacePropertys.Contains(item) && itemvalue!=null)
+                if (!_implementTypes.InterfacePropertys.Any(x=>x.Name==item.Name) && !string.IsNullOrEmpty(headersValue))
                 {
-                    item.SetValue(_requestContext, itemvalue);
+                    var value= Convert.ChangeType(headersValue.ToString(), item.PropertyType);
+                    item.SetValue(_requestContext, value);
                 }
             }
 
