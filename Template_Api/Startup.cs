@@ -1,5 +1,6 @@
 using Core.Elastic.Abstract;
 using Core.Elastic.Concrate;
+using Core.Elastic.Extantions;
 using Core.Exception.Extantions;
 using Core.Infrastructure.Extantions;
 using Core.Localization.Extantions;
@@ -36,7 +37,7 @@ namespace Template_Api
 
             services.AddReqeustContextDependency();
             services.AddBasicAuthDependency(typeof(AknUser));
-           
+            
             var basicAuthConfiguration = _configuration.GetSection("BasicAuthConfiguration");
             if (basicAuthConfiguration.Exists())
             {
@@ -44,17 +45,15 @@ namespace Template_Api
             }
 
             var elasticConfig = _configuration.GetSection("ElasticSearchConfiguration");
-            if (elasticConfig.Exists())
-            {
-                services.Configure<ElasticSearchConfiguration>(elasticConfig);
-            }
-            services.AddScoped(typeof(IElasticSearchProvider<>),typeof(ElasticSearchProvider<>));
+            services.Configure<ElasticSearchConfiguration>(elasticConfig);
+            services.AddElasticSearch();
+
             services.AddAknValidationFilter();
             services.AddControllers();
             // var serviceProvider = services.BuildServiceProvider();
 
             services.AddLocalizationService();
-         
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
