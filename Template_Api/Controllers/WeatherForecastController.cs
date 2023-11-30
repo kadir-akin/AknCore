@@ -51,7 +51,9 @@ namespace Template_Api.Controllers
             //    Message = "test message"
             //});
             //var index = await _elasticSearchProvider.GetDocument(id);
-            _logger.LogInformation("");
+            _logger.LogInformation("test deneme logu info");
+            _logger.LogError("test deneme logu error");
+            _logger.LogWarning("test deneme logu warning");
             return Summaries;
         }
 
