@@ -79,7 +79,7 @@ namespace Template_Api
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseAknLogProvider();
             app.UseRouting();
             app.UseAuthorization();
             app.UseAknExceptionMiddleware();

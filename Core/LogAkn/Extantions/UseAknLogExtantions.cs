@@ -16,7 +16,7 @@ namespace Core.LogAkn.Extantions
 {
     public static class UseAknLogExtantions
     {
-        public static void UseAknLogProvider(IApplicationBuilder app)
+        public static void UseAknLogProvider(this IApplicationBuilder app)
         {
             var services = app.ApplicationServices;
             var projectInfo = (IOptions<ProjectInfoConfiguration>)services.GetService(typeof(IOptions<ProjectInfoConfiguration>));
