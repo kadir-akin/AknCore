@@ -18,7 +18,7 @@ namespace Core.Infrastructure.Extantions
             if (aknRequestContext.GetInterfaces().Contains(aknRequestContext))
                 services.AddScoped(typeof(IAknRequestContext), aknRequestContext);
             else
-                throw new System.Exception("Type is IAknRequestContext implements");
+                throw new System.Exception("Type is not IAknRequestContext implements");
 
 
             
@@ -28,10 +28,12 @@ namespace Core.Infrastructure.Extantions
 
             if (aknRequestContextTypes == null || !aknRequestContextTypes.Any())
             {
-                throw new System.Exception("implement user type bulunamadı");
+                throw new System.Exception("implement user type not found");
             }
 
-            services.AddSingleton(typeof(IAknRequestContextImplementTypes), new AknRequestContextImplementTypes(aknRequestContextTypes?.ToList()));
+            var aknInterfacePropertyList = typeof(IAknRequestContext).GetProperties()?.ToList();
+
+            services.AddSingleton(typeof(IAknRequestContextImplementTypes), new AknRequestContextImplementTypes(aknRequestContextTypes?.ToList(), aknInterfacePropertyList));
 
             
 

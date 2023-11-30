@@ -16,7 +16,7 @@ namespace Core.Security.Middleware
     public class AknRequestContextMiddleware
     {
         private readonly RequestDelegate _next;
-      
+        
         public AknRequestContextMiddleware( RequestDelegate next )
         {
             _next = next;       
@@ -65,13 +65,17 @@ namespace Core.Security.Middleware
             else
                 _requestContext.SpanId = Guid.NewGuid().ToString();
 
-            var otherProperties = _implementTypes.ImplementTypes.FirstOrDefault().GetProperties();
+            var otherProperties = _implementTypes.ImplementTypes.FirstOrDefault()?.GetProperties();
+
+             
 
             foreach (var item in otherProperties)
             {
-                if (true)
+                var itemvalue = item.GetValue(_requestContext);
+               
+                if (!_implementTypes.InterfacePropertys.Contains(item) && itemvalue!=null)
                 {
-
+                    item.SetValue(_requestContext, itemvalue);
                 }
             }
 
