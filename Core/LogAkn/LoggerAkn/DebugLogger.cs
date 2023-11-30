@@ -38,6 +38,9 @@ namespace Core.LogAkn.LoggerAkn
         public bool IsEnabled(LogLevel logLevel) => true;
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, System.Exception exception, Func<TState, System.Exception, string> formatter)
         {
+            if (_httpContext.HttpContext == null)
+                return;
+
             var log = new RequestContextLog(formatter(state, exception), logLevel.ToString(), _httpContext, exception, _requestContext, _user, _projectInfoConfiguration.Value);
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(log));
 
