@@ -27,6 +27,8 @@ namespace Core.LogAkn.Concrate
         public string Query { get; set; }
         public string Id { get; set; }
 
+        public DateTime timestamp { get; set; }
+
         public RequestContextLog(string message, string logLevel, IHttpContextAccessor httpContext, System.Exception exception, IAknRequestContext requestContext, IAknUser user, ProjectInfoConfiguration projectInfo)
         {
             RequestContext = requestContext;
@@ -42,6 +44,7 @@ namespace Core.LogAkn.Concrate
             LogLevel = logLevel;
             Query = httpContext.HttpContext != null ? httpContext.HttpContext.Request.QueryString.Value : null;
             Id = Guid.NewGuid().ToString();
+            timestamp = DateTime.Now;
         }
 
 
