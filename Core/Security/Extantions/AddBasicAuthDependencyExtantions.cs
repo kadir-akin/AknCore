@@ -25,7 +25,7 @@ namespace Core.Security.Extantions
                 throw new System.Exception("implement user type bulunamadı");
             }
 
-            services.AddSingleton(typeof(IAknUserImplementClasses),new AknUserImplementClasses(aknUserTypes?.ToList()));
+            services.AddSingleton(typeof(IAknUserImplementType),new AknUserImplementClasses(aknUserTypes?.ToList()));
             var _configuration= services.BuildServiceProvider().GetService<IConfiguration>();
             var basicAuthConfiguration = _configuration.GetSection("BasicAuthConfiguration");
             if (basicAuthConfiguration.Exists())

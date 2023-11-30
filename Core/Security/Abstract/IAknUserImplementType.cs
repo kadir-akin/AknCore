@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Core.Security.Abstract
 {
-    public interface IAknUserImplementClasses
+    public interface IAknUserImplementType
     {
         public List<Type> ImplementTypes { get; set; }
     }

@@ -31,7 +31,7 @@ namespace Core.Security.Middleware
         public async Task InvokeAsync(HttpContext httpContext, IOptions<BasicAuthConfiguration> _basicAuthConfiguration,
             IBasicAuthenticationHelper _basicAuthenticationHelper,
             IAknUser _aknUser,
-            IAknUserImplementClasses _aknUserImplementClasses
+            IAknUserImplementType _aknUserImplementClasses
             )
         {
             

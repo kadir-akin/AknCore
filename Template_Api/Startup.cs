@@ -35,7 +35,7 @@ namespace Template_Api
         {
 
 
-            services.AddReqeustContextDependency();
+            services.AddReqeustContextDependency(typeof(TestRequestContext));
             services.AddBasicAuthDependency(typeof(AknUser));
             
             var basicAuthConfiguration = _configuration.GetSection("BasicAuthConfiguration");

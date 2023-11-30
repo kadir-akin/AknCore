@@ -1,14 +1,14 @@
-﻿using Core.Security.Abstract;
+﻿using Core.RequestContext.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.Security.Basic
+namespace Core.RequestContext.Concrate
 {
-    public class AknUserImplementClasses : IAknUserImplementType
+    public class AknRequestContextImplementTypes : IAknRequestContextImplementTypes
     {
         private readonly List<Type> _implementTypes;
-        public AknUserImplementClasses(List<Type> implementTypes)
+        public AknRequestContextImplementTypes(List<Type> implementTypes)
         {
             _implementTypes = implementTypes;
         }

@@ -1,4 +1,5 @@
-﻿using Core.Security.Abstract;
+﻿using Core.RequestContext.Abstract;
+using Core.Security.Abstract;
 using Core.Security.Concrete;
 using Core.Security.Jwt;
 using Microsoft.AspNetCore.Http;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,11 +16,12 @@ namespace Core.Security.Middleware
     public class AknRequestContextMiddleware
     {
         private readonly RequestDelegate _next;
+      
         public AknRequestContextMiddleware( RequestDelegate next )
         {
             _next = next;       
         }
-        public async Task InvokeAsync(HttpContext httpContext, IAknRequestContext _requestContext)
+        public async Task InvokeAsync(HttpContext httpContext, IAknRequestContext _requestContext,IAknRequestContextImplementTypes _implementTypes)
         {           
             var headers = httpContext.Request.Headers;
             var CountryId= headers[HeaderConstants.CountryId];
@@ -62,7 +65,15 @@ namespace Core.Security.Middleware
             else
                 _requestContext.SpanId = Guid.NewGuid().ToString();
 
+            var otherProperties = _implementTypes.ImplementTypes.FirstOrDefault().GetProperties();
 
+            foreach (var item in otherProperties)
+            {
+                if (true)
+                {
+
+                }
+            }
 
             await _next(httpContext);
         }
