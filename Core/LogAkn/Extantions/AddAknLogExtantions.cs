@@ -22,7 +22,7 @@ namespace Core.LogAkn.Extantions
 
             services.AddHttpContextAccessor();
             var _configuration = services.BuildServiceProvider().GetService<IConfiguration>();
-            var _loggerFactory = services.BuildServiceProvider().GetService<ILoggerFactory>();
+            
             var projectInfoConfiguration = _configuration.GetSection("ProjectInfoConfiguration");
 
             if (projectInfoConfiguration.Exists())
@@ -40,25 +40,7 @@ namespace Core.LogAkn.Extantions
                     Console.WriteLine("implement edilmeli"); //services.Configure<LogConfiguration>(logConfigurationsection);
                 else
                     throw new System.Exception("LogConfiguration not found");
-
-                var logConfig = services.BuildServiceProvider().GetService<IOptions<LogConfiguration>>();
-                var serviceprovider = services.BuildServiceProvider();
-                var _hostingEnvironment = serviceprovider.GetService<IHostingEnvironment>();
-                var _httpContextAccessor = serviceprovider.GetService<IHttpContextAccessor>();
-                var _requestContext = serviceprovider.GetService<IAknRequestContext>();
-                var _user = serviceprovider.GetService<IAknUser>();
-                
-                if (logConfig.Value.EnableElasticLogProvider)
-                {
-                    var _elasticSearchprovider = serviceprovider.GetService<IElasticSearchProvider<RequestContextLog>>();
-                    _loggerFactory.AddProvider(new ElasticLoggerProvider(_hostingEnvironment,projectInfo,_httpContextAccessor,_requestContext,_user,_elasticSearchprovider));
-                }
-
-                if (logConfig.Value.EnableDebugLogProvider)
-                {
-                    _loggerFactory.AddProvider(new DebugLoggerProvider(_hostingEnvironment, projectInfo, _httpContextAccessor, _requestContext, _user));
-                }
-
+               
             }
 
 
