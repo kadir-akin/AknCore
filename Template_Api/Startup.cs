@@ -37,7 +37,7 @@ namespace Template_Api
 
             services.AddReqeustContextDependency(typeof(TestRequestContext));
             services.AddBasicAuthDependency(typeof(AknUser));
-            
+
             var basicAuthConfiguration = _configuration.GetSection("BasicAuthConfiguration");
             if (basicAuthConfiguration.Exists())
             {
@@ -66,9 +66,9 @@ namespace Template_Api
 
             app.UseRouting();
             app.UseAuthorization();
+            app.UseAknExceptionMiddleware();
             app.UseAknRequestContextExtantion();
             app.UseBasicAuth();
-            app.UseAknExceptionMiddleware();
 
             app.UseEndpoints(endpoints =>
             {

@@ -21,9 +21,12 @@ namespace Template_Api.Controllers
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
         private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
-        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider)
+
+        private readonly ILogger<WeatherForecastController> _logger;
+        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider, ILogger<WeatherForecastController> logger)
         {
             _elasticSearchProvider = elasticSearchProvider;
+            _logger = logger;
         }
 
 
@@ -48,7 +51,7 @@ namespace Template_Api.Controllers
             //    Message = "test message"
             //});
             //var index = await _elasticSearchProvider.GetDocument(id);
-
+            _logger.LogInformation("");
             return Summaries;
         }
 

@@ -1,5 +1,10 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Core.LogAkn.Concrate;
+using Core.RequestContext.Concrate;
+using Core.Security.Abstract;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,10 +13,24 @@ namespace Core.LogAkn.LoggerAkn
 {
     public class DebugLogger : ILogger
     {
-        IHostingEnvironment _hostingEnvironment;
-        public DebugLogger(IHostingEnvironment hostingEnvironment)
+        private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IOptions<ProjectInfoConfiguration> _projectInfoConfiguration;
+        private readonly HttpContext _httpContext;
+        private readonly IAknRequestContext _requestContext;
+        private readonly IAknUser _user;
+        public DebugLogger(
+            IHostingEnvironment hostingEnvironment,
+            IOptions<ProjectInfoConfiguration> projectInfoConfiguration,
+            HttpContext httpContext,
+            IAknRequestContext requestContext,
+            IAknUser user
+            )
         {
             _hostingEnvironment = hostingEnvironment;
+            _projectInfoConfiguration = projectInfoConfiguration;
+            _httpContext = httpContext;
+            _requestContext = requestContext;
+            _user = user;
 
         }
 
@@ -19,7 +38,8 @@ namespace Core.LogAkn.LoggerAkn
         public bool IsEnabled(LogLevel logLevel) => true;
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, System.Exception exception, Func<TState, System.Exception, string> formatter)
         {
-            Console.WriteLine($"Log Level : {logLevel.ToString()} | Event ID : {eventId.Id} | Event Name : {eventId.Name} | Formatter : {formatter(state, exception)}");
+            var log = new RequestContextLog(formatter(state, exception), logLevel.ToString(), _httpContext, exception, _requestContext, _user, _projectInfoConfiguration.Value);
+            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(log));
 
         }
     }

@@ -1,5 +1,5 @@
-﻿using Core.LogAkn.Concrate;
-using Core.LogAkn.LoggerAkn;
+﻿using Core.Elastic.Abstract;
+using Core.LogAkn.Concrate;
 using Core.RequestContext.Concrate;
 using Core.Security.Abstract;
 using Microsoft.AspNetCore.Hosting;
@@ -10,21 +10,23 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Core.LogAkn.LoggerProvider
+namespace Core.LogAkn.LoggerAkn
 {
-    public class DebugLoggerProvider : ILoggerProvider
+    internal class ElasticLogger
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IOptions<ProjectInfoConfiguration> _projectInfoConfiguration;
         private readonly HttpContext _httpContext;
         private readonly IAknRequestContext _requestContext;
         private readonly IAknUser _user;
-        public DebugLoggerProvider(
+        private readonly IElasticSearchProvider<RequestContextLog> _elasticSearchProvider;
+        public ElasticLogger(
             IHostingEnvironment hostingEnvironment,
             IOptions<ProjectInfoConfiguration> projectInfoConfiguration,
             HttpContext httpContext,
             IAknRequestContext requestContext,
-            IAknUser user
+            IAknUser user,
+            IElasticSearchProvider<RequestContextLog> elasticSearchProvider
             )
         {
             _hostingEnvironment = hostingEnvironment;
@@ -32,10 +34,16 @@ namespace Core.LogAkn.LoggerProvider
             _httpContext = httpContext;
             _requestContext = requestContext;
             _user = user;
-
+            _elasticSearchProvider = elasticSearchProvider;
+            _elasticSearchProvider.ChekIndex().GetAwaiter().GetResult();
         }
-        public ILogger CreateLogger(string categoryName) => new DebugLogger(_hostingEnvironment,_projectInfoConfiguration,_httpContext,_requestContext,_user);
-        public void Dispose() => throw new NotImplementedException();
-    }
 
+        public IDisposable BeginScope<TState>(TState state) => null;
+        public bool IsEnabled(LogLevel logLevel) => true;
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, System.Exception exception, Func<TState, System.Exception, string> formatter)
+        {
+            var log = new RequestContextLog(formatter(state, exception), logLevel.ToString(), _httpContext, exception, _requestContext, _user, _projectInfoConfiguration.Value);
+            _elasticSearchProvider.InsertDocument(log);
+        }
+    }
 }

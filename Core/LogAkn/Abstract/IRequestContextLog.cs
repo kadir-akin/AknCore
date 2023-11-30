@@ -1,29 +1,28 @@
-﻿using Core.Security.Abstract;
+﻿using Core.Elastic.Abstract;
+using Core.Security.Abstract;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Core.LogAkn.Abstract
 {
-    public interface IRequestContextLog
+    public interface IRequestContextLog : IElasticIndex
     {
         public IAknRequestContext RequestContext { get; set; }
-       
-        public IAknUser   User { get; set; }
+
+        public IAknUser User { get; set; }
 
         public string ProjectName { get; set; }
 
         public string ApplicationName { get; set; }
 
-        public  int StatusCode { get; set; }
+        public int StatusCode { get; set; }
 
         public int ReturnCode { get; set; }
 
         public string Message { get; set; }
 
         public string CreateDate { get; set; }
-
-        public string AknExceptionType { get; set; }
 
         public System.Exception Exception { get; set; }
 
