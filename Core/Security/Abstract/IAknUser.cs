@@ -7,6 +7,6 @@ namespace Core.Security.Abstract
 {
     public interface IAknUser :IIdentity
     {
-        
+        public string Roles { get; set; }
     }
 }

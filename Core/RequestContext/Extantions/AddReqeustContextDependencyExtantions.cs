@@ -15,11 +15,6 @@ namespace Core.Infrastructure.Extantions
     {
         public static IServiceCollection AddReqeustContextDependency(this IServiceCollection services,Type aknRequestContext)
         {
-            if (aknRequestContext.GetInterfaces().Contains(typeof(IAknRequestContext)))
-                services.AddScoped(typeof(IAknRequestContext), aknRequestContext);
-            else
-                throw new System.Exception("Type is not IAknRequestContext implements");
-           
             var aknRequestContextTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IAknRequestContext).IsAssignableFrom(p) && !p.IsInterface)?.ToList(); ;
@@ -27,6 +22,13 @@ namespace Core.Infrastructure.Extantions
             if (aknRequestContextTypes == null || !aknRequestContextTypes.Any())
                 throw new System.Exception("implement user type not found");
 
+
+            if (aknRequestContext.GetInterfaces().Contains(typeof(IAknRequestContext)))
+                services.AddScoped(typeof(IAknRequestContext), aknRequestContext);
+            else
+                throw new System.Exception("Type is not IAknRequestContext implements");
+           
+            
             var aknInterfacePropertyList = typeof(IAknRequestContext).GetProperties()?.ToList();
 
             var _configuration = services.BuildServiceProvider().GetService<IConfiguration>();
