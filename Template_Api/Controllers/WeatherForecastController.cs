@@ -1,4 +1,6 @@
 ﻿using Core.Elastic.Abstract;
+using Core.LogAkn.Abstract;
+using Core.LogAkn.Extantions;
 using Core.Security.Abstract;
 using Core.Security.Filter;
 using Core.Utilities;
@@ -22,11 +24,12 @@ namespace Template_Api.Controllers
         };
         private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
 
-        private readonly ILogger<WeatherForecastController> _logger;
-        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider, ILogger<WeatherForecastController> logger)
+        private readonly ILogService _logService;
+        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider, ILogService logService)
         {
             _elasticSearchProvider = elasticSearchProvider;
-            _logger = logger;
+      
+            _logService = logService;
         }
 
 
@@ -51,9 +54,10 @@ namespace Template_Api.Controllers
             //    Message = "test message"
             //});
             //var index = await _elasticSearchProvider.GetDocument(id);
-            _logger.LogInformation("test deneme logu info");
-            _logger.LogError("test deneme logu error");
-            _logger.LogWarning("test deneme logu warning");
+            //_logger.LogInformation("test deneme logu info");
+            //_logger.LogError("test deneme logu error");
+            //_logger.LogWarning("test deneme logu warning");
+            _logService.LogInformation("kadir akın logu eklendi");
             return Summaries;
         }
 

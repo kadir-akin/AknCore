@@ -72,7 +72,7 @@ namespace Template_Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDebugLoggerProvider _debugLoggerProvider, IElasticLoggerProvider elasticLoggerProvider)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -85,7 +85,7 @@ namespace Template_Api
             app.UseAknExceptionMiddleware();
             app.UseAknRequestContextExtantion();
             app.UseBasicAuth();
-            app.UseAknLogProvider( _debugLoggerProvider, elasticLoggerProvider);
+          //  app.UseAknLogProvider( _debugLoggerProvider, elasticLoggerProvider);
            
             app.UseEndpoints(endpoints =>
             {
