@@ -25,11 +25,12 @@ namespace Template_Api.Controllers
         private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
 
         private readonly ILogService _logService;
-        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider, ILogService logService)
+        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider, ILogService logService )
         {
             _elasticSearchProvider = elasticSearchProvider;
       
             _logService = logService;
+           
         }
 
 
@@ -57,7 +58,7 @@ namespace Template_Api.Controllers
             //_logger.LogInformation("test deneme logu info");
             //_logger.LogError("test deneme logu error");
             //_logger.LogWarning("test deneme logu warning");
-            _logService.LogInformation("kadir akın logu eklendi");
+            _logService.LogInformation("{0} logu eklendi","Kadir akın");
             return Summaries;
         }
 

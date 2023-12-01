@@ -7,7 +7,6 @@ namespace Core.LogAkn.Abstract
 {
     public interface ILogService
     {
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, System.Exception exception, Func<TState, System.Exception, string> formatter);
-
+        public void Log( LogLevel logLevel, EventId eventId, System.Exception exception, string message, params object[] args);
     }
 }

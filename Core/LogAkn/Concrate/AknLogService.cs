@@ -1,5 +1,6 @@
 ﻿using Core.LogAkn.Abstract;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,19 +13,36 @@ namespace Core.LogAkn.Concrate
         private readonly IDebugLoggerProvider _debugLoggerProvider;
         private readonly IElasticLoggerProvider  _elasticLoggerProvider;
         private readonly ILogger _logger;
-        public AknLogService(ILoggerFactory loggerFactory, IDebugLoggerProvider debugLoggerProvider, IElasticLoggerProvider elasticLoggerProvider)
+        private readonly IOptions<LogConfiguration> _logConfig;
+        public AknLogService(ILoggerFactory loggerFactory, IDebugLoggerProvider debugLoggerProvider, IElasticLoggerProvider elasticLoggerProvider,IOptions<LogConfiguration> logConfig)
         {
             _loggerFactory = loggerFactory;
             _debugLoggerProvider = debugLoggerProvider;
             _elasticLoggerProvider = elasticLoggerProvider;
-            _loggerFactory.AddProvider(_elasticLoggerProvider);
+            _logConfig = logConfig;
+            
+            if(_logConfig.Value.EnableDebugLogProvider)            
             _loggerFactory.AddProvider(_debugLoggerProvider);
+            
+            if(_logConfig.Value.EnableElasticLogProvider)
+            _loggerFactory.AddProvider(_elasticLoggerProvider);
+
             _logger = _loggerFactory.CreateLogger("");
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, System.Exception exception, Func<TState, System.Exception, string> formatter)
+        public IDisposable BeginScope<TState>(TState state)
         {
-            _logger.Log(logLevel, eventId, state, exception, formatter);
+            return null;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public void Log(LogLevel logLevel, EventId eventId, System.Exception exception, string message, params object[] args)
+        {
+            _logger.Log(logLevel, eventId,exception, message, args);
         }
     }
 
