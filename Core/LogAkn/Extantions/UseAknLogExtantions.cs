@@ -19,28 +19,21 @@ namespace Core.LogAkn.Extantions
     {
         public static void UseAknLogProvider(this IApplicationBuilder app, IDebugLoggerProvider   _debugLoggerProvider, IElasticLoggerProvider  elasticLoggerProvider)
         {
-            var services = app.ApplicationServices;
-            var projectInfo = (IOptions<ProjectInfoConfiguration>)services.GetService(typeof(IOptions<ProjectInfoConfiguration>));
+            var services = app.ApplicationServices;        
             var logConfig =(IOptions<LogConfiguration>) services.GetService(typeof(IOptions<LogConfiguration>));
             var _loggerFactory =(ILoggerFactory)services.GetService(typeof(ILoggerFactory));
            
-            if (projectInfo.Value.EnableLog)
-            {
-               
-                var _hostingEnvironment = (IHostingEnvironment)services.GetService(typeof(IHostingEnvironment));
-                var _httpContextAccessor =(IHttpContextAccessor) services.GetService(typeof(IHttpContextAccessor));
-                               
+            if (logConfig.Value.EnableLog)
+            {                                                           
                 if (logConfig.Value.EnableElasticLogProvider)
                 {                   
-                    _loggerFactory.AddProvider(elasticLoggerProvider);
-                    
+                    _loggerFactory.AddProvider(elasticLoggerProvider);                    
                 }
 
                 if (logConfig.Value.EnableDebugLogProvider)
                 {
                     _loggerFactory.AddProvider(_debugLoggerProvider);
                 }
-
             }
         }
     }

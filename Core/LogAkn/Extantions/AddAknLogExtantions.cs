@@ -22,27 +22,19 @@ namespace Core.LogAkn.Extantions
         {
 
             services.AddHttpContextAccessor();
-            var _configuration = services.BuildServiceProvider().GetService<IConfiguration>();
-            
-            var projectInfoConfiguration = _configuration.GetSection("ProjectInfoConfiguration");
+            var servisProvider = services.BuildServiceProvider();
+            var _configuration = servisProvider.GetService<IConfiguration>();
 
-            if (projectInfoConfiguration.Exists())
-                Console.WriteLine("implement edilmeli"); //services.Configure<ProjectInfoConfiguration>(projectInfoConfiguration);
+            var logConfigurationsection = _configuration.GetSection("LogConfiguration");
+            var logInfo = servisProvider.GetService<IOptions<LogConfiguration>>();
+
+            if (logConfigurationsection.Exists())
+                Console.WriteLine("implement edilmeli"); //services.Configure<LogConfiguration>(logConfigurationsection);
             else
-                throw new System.Exception("ProjectInfoConfiguration not found");
+                throw new System.Exception("LogConfiguration not found");
 
-            var projectInfo = services.BuildServiceProvider().GetService<IOptions<ProjectInfoConfiguration>>();
-
-            if (projectInfo.Value.EnableLog)
+            if (logInfo.Value.EnableLog)
             {
-                var logConfigurationsection = _configuration.GetSection("LogConfiguration");
-                var logInfo = services.BuildServiceProvider().GetService<IOptions<LogConfiguration>>();
-
-                if (logConfigurationsection.Exists())
-                    Console.WriteLine("implement edilmeli"); //services.Configure<LogConfiguration>(logConfigurationsection);
-                else
-                    throw new System.Exception("LogConfiguration not found");
-
                 if (logInfo.Value.EnableElasticLogProvider)
                 {
                     services.AddScoped<IElasticLoggerProvider, ElasticLoggerProvider>();
@@ -54,9 +46,6 @@ namespace Core.LogAkn.Extantions
                 }
 
             }
-
-
-
 
             return services;
         }

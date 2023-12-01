@@ -9,5 +9,7 @@ namespace Core.LogAkn.Concrate
         public bool EnableDebugLogProvider { get; set; }
 
         public bool EnableElasticLogProvider { get; set; }
+
+        public bool EnableLog { get; set; }
     }
 }

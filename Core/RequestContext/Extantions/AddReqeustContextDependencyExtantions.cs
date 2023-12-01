@@ -19,9 +19,7 @@ namespace Core.Infrastructure.Extantions
                 services.AddScoped(typeof(IAknRequestContext), aknRequestContext);
             else
                 throw new System.Exception("Type is not IAknRequestContext implements");
-
-
-            
+           
             var aknRequestContextTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
                 .Where(p => typeof(IAknRequestContext).IsAssignableFrom(p) && !p.IsInterface)?.ToList(); ;

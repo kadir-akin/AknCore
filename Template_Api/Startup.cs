@@ -38,10 +38,15 @@ namespace Template_Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var projectInfoConfiguration = _configuration.GetSection("ProjectInfoConfiguration");
+            if (projectInfoConfiguration.Exists())
+                services.Configure<ProjectInfoConfiguration>(projectInfoConfiguration);
 
 
-            services.AddReqeustContextDependency(typeof(TestRequestContext));
-            services.AddBasicAuthDependency(typeof(AknUser));
+            var logConfigurationsection = _configuration.GetSection("LogConfiguration");
+            if (logConfigurationsection.Exists())
+                services.Configure<LogConfiguration>(logConfigurationsection);
+
 
             var basicAuthConfiguration = _configuration.GetSection("BasicAuthConfiguration");
             if (basicAuthConfiguration.Exists())
@@ -50,27 +55,19 @@ namespace Template_Api
             }
 
             var elasticConfig = _configuration.GetSection("ElasticSearchConfiguration");
-           
-            services.Configure<ElasticSearchConfiguration>(elasticConfig);
+            if (elasticConfig.Exists())
+            {
+                services.Configure<ElasticSearchConfiguration>(elasticConfig);
+
+            }
+            services.AddReqeustContextDependency(typeof(TestRequestContext));
+            services.AddBasicAuthDependency(typeof(AknUser));                      
             services.AddElasticSearch();
-
             services.AddAknValidationFilter();
-            services.AddControllers();
-            // var serviceProvider = services.BuildServiceProvider();
-
-            services.AddLocalizationService();
             
-            var projectInfoConfiguration = _configuration.GetSection("ProjectInfoConfiguration");
-
-            if (projectInfoConfiguration.Exists())
-               services.Configure<ProjectInfoConfiguration>(projectInfoConfiguration);
-            
-            
-            var logConfigurationsection = _configuration.GetSection("LogConfiguration");
-
-            if (logConfigurationsection.Exists())
-               services.Configure<LogConfiguration>(logConfigurationsection);
-
+            services.AddControllers();          
+           
+            services.AddLocalizationService();                                
             services.AddAknLogDependency();
         }
 
@@ -84,10 +81,12 @@ namespace Template_Api
           
             app.UseRouting();
             app.UseAuthorization();
+
             app.UseAknExceptionMiddleware();
             app.UseAknRequestContextExtantion();
             app.UseBasicAuth();
             app.UseAknLogProvider( _debugLoggerProvider, elasticLoggerProvider);
+           
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

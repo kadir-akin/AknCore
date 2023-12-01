@@ -9,7 +9,6 @@ namespace Core.RequestContext.Concrate
     {
         public string ProjectName { get; set; }
         public string ApplicationName { get; set; }    
-        public bool  EnableLog { get; set; }
         
     }
 }
