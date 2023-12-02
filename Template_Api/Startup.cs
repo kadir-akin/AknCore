@@ -85,7 +85,6 @@ namespace Template_Api
             app.UseAknExceptionMiddleware();
             app.UseAknRequestContextExtantion();
             app.UseBasicAuth();
-          //  app.UseAknLogProvider( _debugLoggerProvider, elasticLoggerProvider);
            
             app.UseEndpoints(endpoints =>
             {

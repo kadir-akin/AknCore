@@ -45,7 +45,7 @@ namespace Core.LogAkn.Extantions
                     services.AddScoped<IDebugLoggerProvider, DebugLoggerProvider>();
                 }
 
-                services.AddSingleton<ILogContext, LogContext>();
+                services.AddScoped<ILogContext, LogContext>();
                 services.AddScoped<IAknLoggerFactory, AknLoggerFactory>();
                 services.AddScoped<ILogService,AknLogService>();              
             }

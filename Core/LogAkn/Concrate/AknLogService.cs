@@ -13,7 +13,6 @@ namespace Core.LogAkn.Concrate
         private readonly IAknLoggerFactory _loggerFactory;
         private readonly IDebugLoggerProvider _debugLoggerProvider;
         private readonly IElasticLoggerProvider  _elasticLoggerProvider;
-        private readonly IAknLogger _logger;
         private readonly IOptions<LogConfiguration> _logConfig;
         private readonly ILogContext _logContext;
 
