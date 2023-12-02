@@ -46,9 +46,20 @@ namespace Core.Security.Middleware
                 
                 if (authenticationResult.IsSuccess) 
                 {
-                    var user = JsonConvert.DeserializeObject<IAknUser>((string)authenticationResult.Data, AknUserJsonConvertor.GetJsonSerializerSettings(_aknUserImplementClasses.ImplementTypes.FirstOrDefault()));
-                    _aknUser= user;
-                    httpContext.User = _aknUser?.SetCurrentUser();                  
+                    var properries = _aknUserImplementClasses.ImplementTypes.FirstOrDefault().GetProperties();                    
+                    var userInfo = JsonConvert.DeserializeObject<IAknUser>((string)authenticationResult.Data, AknUserJsonConvertor.GetJsonSerializerSettings(_aknUserImplementClasses.ImplementTypes.FirstOrDefault()));
+
+                    foreach (var item in properries)
+                    {
+                        var value = item.GetValue(userInfo);
+
+                        if (value != null)
+                            item.SetValue(_aknUser, value);
+                    }
+
+                    httpContext.User = _aknUser?.SetCurrentUser();
+                    _aknUser.IsAuthenticated = true;
+                    _aknUser.AuthenticationType=Core.Security.Concrete.AuthotanticationType.BASIC.ToString();
                 }
             }
             
