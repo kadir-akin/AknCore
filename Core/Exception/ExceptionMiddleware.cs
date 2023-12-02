@@ -53,7 +53,7 @@ namespace Core.Exception
             }
 
             var resulModel= new ErrorResult<List<AknExceptionDetail>>(aknException.ExceptionDetailList, aknException.ExceptionDetailList.FirstOrDefault().Status, aknException.ExceptionDetailList.FirstOrDefault().Message);
-            logService.LogInformationAsync(aknException, aknException?.Message);
+            logService.LogErrorAsync(aknException, aknException?.Message);
 
             return context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(resulModel));
         }
