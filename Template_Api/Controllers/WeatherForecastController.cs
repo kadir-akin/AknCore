@@ -42,7 +42,7 @@ namespace Template_Api.Controllers
             return Summaries;
         }
         [HttpPost]
-        [AknAuthorizationFilter("TESTROLE")]
+        [AknAuthorizationFilter("TESTROL")]
         public async Task<object> abc([FromBody] TestInputObject test)
         {
             var userhttpContext = HttpContext.User;

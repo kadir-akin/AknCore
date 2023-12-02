@@ -41,7 +41,7 @@ namespace Core.Exception
                 aknException = new AknException(exception);
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             }
-            else if (exception.GetType() == typeof(AknException)) 
+            else if (exception.GetType().BaseType == typeof(AknException)) 
             {
                 aknException = (AknException)exception;
                 context.Response.StatusCode = aknException.ExceptionDetailList.FirstOrDefault().Status;

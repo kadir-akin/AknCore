@@ -60,10 +60,11 @@ namespace Template_Api
                 services.Configure<ElasticSearchConfiguration>(elasticConfig);
 
             }
+            services.AddAknValidationFilter();
             services.AddReqeustContextDependency(typeof(TestRequestContext));
             services.AddBasicAuthDependency(typeof(AknUser));                      
             services.AddElasticSearch();
-            services.AddAknValidationFilter();
+           
             
             services.AddControllers();          
            
