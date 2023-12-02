@@ -1,4 +1,6 @@
-﻿using Core.ResultModel;
+﻿using Core.LogAkn.Abstract;
+using Core.LogAkn.Extantions;
+using Core.ResultModel;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -18,7 +20,7 @@ namespace Core.Exception
         {
             _next = next;
         }
-        public async Task InvokeAsync(HttpContext httpContext)
+        public async Task InvokeAsync(HttpContext httpContext,ILogService logService)
         {
 
             try
@@ -27,10 +29,10 @@ namespace Core.Exception
             }
             catch (System.Exception ex)
             {
-                await HandleExceptionAsync(httpContext, ex);
+                await HandleExceptionAsync(httpContext, ex, logService);
             }
         }
-        private Task HandleExceptionAsync(HttpContext context, System.Exception exception)
+        private Task HandleExceptionAsync(HttpContext context, System.Exception exception, ILogService logService)
         {
             AknException aknException= null;
             context.Response.ContentType = "application/json";
@@ -42,6 +44,7 @@ namespace Core.Exception
             else if (exception.GetType() == typeof(AknException)) 
             {
                 aknException = (AknException)exception;
+                context.Response.StatusCode = aknException.ExceptionDetailList.FirstOrDefault().Status;
             }
             else
             {
@@ -50,7 +53,7 @@ namespace Core.Exception
             }
 
             var resulModel= new ErrorResult<List<AknExceptionDetail>>(aknException.ExceptionDetailList, aknException.ExceptionDetailList.FirstOrDefault().Status, aknException.ExceptionDetailList.FirstOrDefault().Message);
-
+            logService.LogInformationAsync(aknException, aknException?.Message);
 
             return context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(resulModel));
         }

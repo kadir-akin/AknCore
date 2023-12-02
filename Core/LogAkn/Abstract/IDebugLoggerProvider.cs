@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Core.LogAkn.Abstract
 {
-    public interface IDebugLoggerProvider :ILoggerProvider
+    public interface IDebugLoggerProvider :IAknLoggerProvider
     {
     }
 }

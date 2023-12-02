@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Core.LogAkn.Abstract
 {
-    public interface ILogService
+    public  interface IAknLogger
     {
-        public Task LogAsync( LogLevel logLevel, EventId eventId, System.Exception exception, string message, params object[] args);
-
+        public Task LogAsync(LogLevel logLevel, EventId eventId, System.Exception exception, string message, params object[] args);
     }
 }

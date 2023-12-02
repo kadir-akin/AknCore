@@ -21,18 +21,18 @@ namespace Core.LogAkn.Extantions
         {
             var services = app.ApplicationServices;        
             var logConfig =(IOptions<LogConfiguration>) services.GetService(typeof(IOptions<LogConfiguration>));
-            var _loggerFactory =(ILoggerFactory)services.GetService(typeof(ILoggerFactory));
+            var _loggerFactory =(IAknLoggerFactory)services.GetService(typeof(IAknLoggerFactory));
            
             if (logConfig.Value.EnableLog)
             {                                                           
                 if (logConfig.Value.EnableElasticLogProvider)
                 {                   
-                    _loggerFactory.AddProvider(elasticLoggerProvider);                    
+                    _loggerFactory.AddLoggerProvider(elasticLoggerProvider);                    
                 }
 
                 if (logConfig.Value.EnableDebugLogProvider)
                 {
-                    _loggerFactory.AddProvider(_debugLoggerProvider);
+                    _loggerFactory.AddLoggerProvider(_debugLoggerProvider);
                 }
             }
         }

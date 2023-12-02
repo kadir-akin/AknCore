@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Core.LogAkn.Abstract
 {
-    public interface IElasticLoggerProvider :ILoggerProvider
+    public interface IElasticLoggerProvider : IAknLoggerProvider
     {
     }
 }

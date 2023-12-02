@@ -19,8 +19,7 @@ namespace Core.LogAkn.LoggerProvider
         private readonly IOptions<ProjectInfoConfiguration> _projectInfoConfiguration;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IAknRequestContext _requestContext;
-        private readonly IAknUser _user;
-        private readonly List<DebugLogger> debugLoggerProviders = new List<DebugLogger>();
+        private readonly IAknUser _user;       
         public DebugLoggerProvider(
             IHostingEnvironment hostingEnvironment,
             IOptions<ProjectInfoConfiguration> projectInfoConfiguration,
@@ -36,13 +35,11 @@ namespace Core.LogAkn.LoggerProvider
             _user = user;
 
         }
-        public ILogger CreateLogger(string categoryName)
+        public IAknLogger CreateLogger()
         {
-            var logger = new DebugLogger(_hostingEnvironment, _projectInfoConfiguration, _httpContext, _requestContext, _user);
-            debugLoggerProviders.Add(logger);
+            var logger = new DebugLogger(_hostingEnvironment, _projectInfoConfiguration, _httpContext, _requestContext, _user);          
             return logger;
         }
-        public void Dispose() => debugLoggerProviders.Clear();
     }
 
 }

@@ -22,7 +22,6 @@ namespace Core.LogAkn.LoggerProvider
         private readonly IAknRequestContext _requestContext;
         private readonly IAknUser _user;
         private readonly IElasticSearchProvider<RequestContextLog> _elasticSearchProvider;
-        private readonly List<ElasticLogger> elasticLoggerProviders = new List<ElasticLogger>();
         public ElasticLoggerProvider(
             IHostingEnvironment hostingEnvironment,
             IOptions<ProjectInfoConfiguration> projectInfoConfiguration,
@@ -40,18 +39,10 @@ namespace Core.LogAkn.LoggerProvider
             _elasticSearchProvider = elasticSearchProvider;
 
         }
-
-
-        public ILogger CreateLogger(string categoryName)
+        public IAknLogger CreateLogger()
         {
             var logger = new ElasticLogger(_hostingEnvironment, _projectInfoConfiguration, _httpContext, _requestContext, _user, _elasticSearchProvider);
-            elasticLoggerProviders.Add(logger);
             return logger;
-        }
-        public void Dispose()
-        {
-            elasticLoggerProviders.Clear();
-
-        }
+        }       
     }
 }

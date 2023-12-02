@@ -1,4 +1,5 @@
-﻿using Core.LogAkn.Concrate;
+﻿using Core.LogAkn.Abstract;
+using Core.LogAkn.Concrate;
 using Core.RequestContext.Concrate;
 using Core.Security.Abstract;
 using Microsoft.AspNetCore.Hosting;
@@ -7,11 +8,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Core.LogAkn.LoggerAkn
 {
-    public class DebugLogger : ILogger
+    public class DebugLogger : IAknLogger
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IOptions<ProjectInfoConfiguration> _projectInfoConfiguration;
@@ -34,17 +37,21 @@ namespace Core.LogAkn.LoggerAkn
 
         }
 
-        public IDisposable BeginScope<TState>(TState state) => null;
-        public bool IsEnabled(LogLevel logLevel) => true;
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, System.Exception exception, Func<TState, System.Exception, string> formatter)
+        public Task LogAsync(LogLevel logLevel, EventId eventId, System.Exception exception,string message,params object[] args) 
         {
             if (_httpContext.HttpContext == null)
-                return;
+                return Task.CompletedTask;
+            
+            if (args !=null && args.Any())
+            {
+                message = string.Format(message, args);
+            }
 
-            var log = new RequestContextLog(formatter(state, exception), logLevel.ToString(), _httpContext, exception, _requestContext, _user, _projectInfoConfiguration.Value);
+            var log = new RequestContextLog(message, logLevel.ToString(), _httpContext, exception, _requestContext, _user, _projectInfoConfiguration.Value);
             Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(log));
 
-        }
+            return Task.CompletedTask;
+        }      
     }
 }
 

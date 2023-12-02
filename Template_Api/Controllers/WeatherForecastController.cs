@@ -66,7 +66,7 @@ namespace Template_Api.Controllers
                 userID = user.UserId;
             }
 
-            _logService.LogInformation("{0} logu eklendi user Id :{1}","Kadir akın", userID);
+            _logService.LogInformationAsync("{0} logu eklendi user Id :{1}","Kadir akın", userID);
             return Summaries;
         }
 
