@@ -13,8 +13,8 @@ namespace Core.LogAkn.Concrate
 {
     public class RequestContextLog : IRequestContextLog
     {
-        public IAknRequestContext RequestContext { get; set; }
-        public IAknUser User { get; set; }
+        public object RequestContext { get; set; }
+        public object User { get; set; }
         public string ProjectName { get; set; }
         public string ApplicationName { get; set; }
         public int StatusCode { get; set; }

@@ -8,9 +8,9 @@ namespace Core.LogAkn.Abstract
 {
     public interface IRequestContextLog : IElasticIndex
     {
-        public IAknRequestContext RequestContext { get; set; }
+        public object RequestContext { get; set; }
 
-        public IAknUser User { get; set; }
+        public object User { get; set; }
 
         public string ProjectName { get; set; }
 
