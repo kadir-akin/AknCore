@@ -22,14 +22,11 @@ namespace Template_Api.Controllers
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
-        private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
 
         private readonly ILogService _logService;
         private readonly IAknUser _aknUser;
-        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider, ILogService logService, IAknUser aknUser)
-        {
-            _elasticSearchProvider = elasticSearchProvider;
-      
+        public WeatherForecastController( ILogService logService, IAknUser aknUser)
+        {     
             _logService = logService;
            _aknUser = aknUser;
         }
