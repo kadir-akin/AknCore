@@ -7,6 +7,7 @@ using Core.Localization.Extantions;
 using Core.LogAkn.Abstract;
 using Core.LogAkn.Concrate;
 using Core.LogAkn.Extantions;
+using Core.Metric.Extantions;
 using Core.RequestContext.Concrate;
 using Core.Security.Abstract;
 using Core.Security.Basic;
@@ -81,6 +82,7 @@ namespace Template_Api
             }
           
             app.UseRouting();
+            app.UseAknMetrics();
             app.UseAuthorization();
 
             app.UseAknExceptionMiddleware();

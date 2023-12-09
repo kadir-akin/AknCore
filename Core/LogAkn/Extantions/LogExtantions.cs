@@ -1,9 +1,5 @@
 ﻿using Core.LogAkn.Abstract;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Core.LogAkn.Extantions

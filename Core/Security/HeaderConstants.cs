@@ -6,7 +6,7 @@ namespace Core.Security
 {
     public class HeaderConstants
     {
-        public const string IgnoreEndpoindName = "Login";
+        public const string IgnoreEndpoindNames = "Login,startup,metrics-text,metrics";
         public const string UserName = "UserName";
         public const string Password = "Password";
         public const string Authorization = "Authorization";

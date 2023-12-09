@@ -6,6 +6,7 @@ using Core.Security.Filter;
 using Core.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Prometheus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,8 @@ namespace Template_Api.Controllers
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
-
+        private static readonly Counter LogicInvocationCounter = Metrics
+               .CreateCounter("logic_invocation", "Number of invoked jobs.");
         private readonly ILogService _logService;
         private readonly IAknUser _aknUser;
         public WeatherForecastController( ILogService logService, IAknUser aknUser)
@@ -39,9 +41,10 @@ namespace Template_Api.Controllers
             return Summaries;
         }
         [HttpPost]
-        [AknAuthorizationFilter("TESTROL")]
+        [AknAuthorizationFilter("TESTROLE")]
         public async Task<object> abc([FromBody] TestInputObject test)
         {
+            LogicInvocationCounter.Inc();
             var userhttpContext = HttpContext.User;
             var threadUser = AknUserUtilities.GetCurrentUser();
             //await _elasticSearchProvider.ChekIndex();

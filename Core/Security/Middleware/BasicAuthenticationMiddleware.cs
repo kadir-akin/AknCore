@@ -38,7 +38,17 @@ namespace Core.Security.Middleware
             var headers = httpContext.Request.Headers;
             AuthenticationResult authenticationResult = new AuthenticationResult(false);
             var path = httpContext.Request.Path.ToString();
-            var isIgnoreEndpoind = path.Contains(HeaderConstants.IgnoreEndpoindName) || path.Contains("startup");
+            bool isIgnoreEndpoind = false;
+            
+            foreach (var item in HeaderConstants.IgnoreEndpoindNames.Split(','))
+            {
+                if (path.Contains(item))
+                {
+                    isIgnoreEndpoind = true;
+                    break;
+                }
+            }
+           
 
             if (_basicAuthConfiguration.Value != null && !isIgnoreEndpoind)
             {
@@ -65,11 +75,7 @@ namespace Core.Security.Middleware
             
             if (!authenticationResult.IsSuccess && !isIgnoreEndpoind) 
             { 
-                var aknException = new UnAuthenticationException();
-                var resulModel = new ErrorResult<List<AknExceptionDetail>>(aknException.ExceptionDetailList, aknException.ExceptionDetailList.FirstOrDefault().Status, aknException.ExceptionDetailList.FirstOrDefault().Message);
-
-                httpContext.Response.ContentType = "application/json";
-                await httpContext.Response.WriteAsync(JsonConvert.SerializeObject(resulModel));            
+                throw new UnAuthenticationException();                         
             }
 
 
