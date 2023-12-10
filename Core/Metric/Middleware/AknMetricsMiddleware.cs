@@ -26,6 +26,8 @@ namespace Core.Metric.Middleware
             aknMetricsUtilities.TotalRequestCounter();
                  
             await _next(httpContext);
+            var httpStatusCode = httpContext.Response.StatusCode;
+            aknMetricsUtilities.TotalHttpStatusCodeCounter(httpStatusCode.ToString());
         }
     }
 }

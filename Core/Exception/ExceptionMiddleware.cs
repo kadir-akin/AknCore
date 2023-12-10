@@ -21,29 +21,29 @@ namespace Core.Exception
         {
             _next = next;
         }
-        public async Task InvokeAsync(HttpContext httpContext,ILogService logService, AknMetricsUtilities aknMetricsUtilities)
+        public async Task InvokeAsync(HttpContext httpContext,ILogService logService)
         {
 
             try
             {                
                 await _next(httpContext);
-                aknMetricsUtilities.TotalHttpStatusCodeCounter("200");
-            }
+                
+            }           
             catch (System.Exception ex)
             {
-                await HandleExceptionAsync(httpContext, ex, logService, aknMetricsUtilities);
+                await HandleExceptionAsync(httpContext, ex, logService);
             }
         }
-        private Task HandleExceptionAsync(HttpContext context, System.Exception exception, ILogService logService, AknMetricsUtilities aknMetricsUtilities)
+        private Task HandleExceptionAsync(HttpContext context, System.Exception exception, ILogService logService)
         {
             AknException aknException= null;
             context.Response.ContentType = "application/json";
-            if (exception.GetType() == typeof(SecurityException)) 
+            if (exception is SecurityException) 
             {
                 aknException = new AknException(exception);
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             }
-            else if (exception.GetType().BaseType == typeof(AknException)) 
+            else if (exception is AknException) 
             {
                 aknException = (AknException)exception;
                 context.Response.StatusCode = aknException.ExceptionDetailList.FirstOrDefault().Status;
@@ -55,10 +55,7 @@ namespace Core.Exception
             }
 
             var resulModel= new ErrorResult<List<AknExceptionDetail>>(aknException.ExceptionDetailList, aknException.ExceptionDetailList.FirstOrDefault().Status, aknException.ExceptionDetailList.FirstOrDefault().Message);
-            logService.LogErrorAsync(aknException, aknException?.Message);
-
-            aknMetricsUtilities.TotalHttpStatusCodeCounter(context.Response.StatusCode.ToString());
-                      
+            logService.LogErrorAsync(aknException, aknException?.Message);                                  
             return context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(resulModel));
         }
     }
