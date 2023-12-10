@@ -1,6 +1,7 @@
 ﻿using Core.LogAkn.Abstract;
 using Core.LogAkn.Extantions;
 using Core.ResultModel;
+using Core.Utilities;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -20,19 +21,20 @@ namespace Core.Exception
         {
             _next = next;
         }
-        public async Task InvokeAsync(HttpContext httpContext,ILogService logService)
+        public async Task InvokeAsync(HttpContext httpContext,ILogService logService, AknMetricsUtilities aknMetricsUtilities)
         {
 
             try
             {                
                 await _next(httpContext);
+                aknMetricsUtilities.TotalHttpStatusCodeCounter("200");
             }
             catch (System.Exception ex)
             {
-                await HandleExceptionAsync(httpContext, ex, logService);
+                await HandleExceptionAsync(httpContext, ex, logService, aknMetricsUtilities);
             }
         }
-        private Task HandleExceptionAsync(HttpContext context, System.Exception exception, ILogService logService)
+        private Task HandleExceptionAsync(HttpContext context, System.Exception exception, ILogService logService, AknMetricsUtilities aknMetricsUtilities)
         {
             AknException aknException= null;
             context.Response.ContentType = "application/json";
@@ -55,6 +57,8 @@ namespace Core.Exception
             var resulModel= new ErrorResult<List<AknExceptionDetail>>(aknException.ExceptionDetailList, aknException.ExceptionDetailList.FirstOrDefault().Status, aknException.ExceptionDetailList.FirstOrDefault().Message);
             logService.LogErrorAsync(aknException, aknException?.Message);
 
+            aknMetricsUtilities.TotalHttpStatusCodeCounter(context.Response.StatusCode.ToString());
+                      
             return context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(resulModel));
         }
     }

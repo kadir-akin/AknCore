@@ -13,9 +13,4 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Metric\Abstract\" />
-    <Folder Include="Metric\Concrate\" />
-  </ItemGroup>
-
 </Project>

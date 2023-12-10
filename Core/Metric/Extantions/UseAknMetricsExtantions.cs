@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Core.Metric.Middleware;
+using Microsoft.AspNetCore.Builder;
 using Prometheus;
 using System;
 using System.Collections.Generic;
@@ -11,8 +12,9 @@ namespace Core.Metric.Extantions
         public static void UseAknMetrics(this IApplicationBuilder app)
         {
 
-
+           
             app.UseHttpMetrics();
+            app.UseMiddleware<AknMetricsMiddleware>();
         }
     }
 }
