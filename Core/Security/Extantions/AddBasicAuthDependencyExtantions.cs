@@ -13,7 +13,7 @@ namespace Core.Security.Extantions
 {
     public static class AddBasicAuthDependencyExtantions
     {
-        public static IServiceCollection AddBasicAuthDependency(this IServiceCollection services,Type AknUserType)
+        public static IServiceCollection AddBasicAuthDependency(this IServiceCollection services,Type AknUserType,List<string> IgnoreEndpoindNames =null)
         {
             var aknUserTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(s => s.GetTypes())
@@ -27,8 +27,13 @@ namespace Core.Security.Extantions
                 services.AddScoped(typeof(IAknUser), AknUserType);
             else
                 throw new System.Exception("Type is not IAknUser implements");
-                                                             
-            services.AddSingleton(typeof(IAknUserImplementType),new AknUserImplementClasses(aknUserTypes?.ToList()));
+
+            var ignoreEndpoinds = HeaderConstants.IgnoreEndpoindNames.Split(',').ToList();
+
+            if (IgnoreEndpoindNames !=null && IgnoreEndpoindNames.Any())
+                ignoreEndpoinds.AddRange(IgnoreEndpoindNames);
+
+            services.AddSingleton(typeof(IAknUserContext),new AknUserContext(aknUserTypes?.ToList(), ignoreEndpoinds));
           
             var _configuration= services.BuildServiceProvider().GetService<IConfiguration>();
             var basicAuthConfiguration = _configuration.GetSection("BasicAuthConfiguration");
