@@ -1,3 +1,4 @@
+using Core.Bus.RabbitMq;
 using Core.Elastic.Abstract;
 using Core.Elastic.Concrate;
 using Core.Elastic.Extantions;
@@ -73,6 +74,9 @@ namespace Template_Api
            
             services.AddLocalizationService();                                
             services.AddAknLogDependency();
+
+
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

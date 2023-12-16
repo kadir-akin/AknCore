@@ -1,4 +1,5 @@
-﻿using Core.Security.Abstract;
+﻿using Core.Bus.RabbitMq;
+using Core.Security.Abstract;
 
 namespace Template_Api
 {

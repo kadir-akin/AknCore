@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Core.Validation.Filter;
 using Core.Validation.Concrete;
 using System.Reflection;
+using Core.Utilities;
 
 namespace Core.Validation.Extansions
 {
@@ -25,13 +26,8 @@ namespace Core.Validation.Extansions
             //    listOfAssemblies.Add(Assembly.Load(refAsmName));
             //}
            
-
-
-            var interfaceValidatorType = typeof(IValidator);
-
-            var types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => interfaceValidatorType.IsAssignableFrom(p))?.ToList();
+            var types= TypeUtilities.GetAllAssembysTypeFromAssignableInterface(typeof(IValidator), false);
+            
             services.AddSingleton(typeof(IValidationContext),new ValidationContext(types));
 
             services.AddMvc(x => x.Filters.Add(typeof(AknValidationFilter)));

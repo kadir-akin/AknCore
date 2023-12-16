@@ -2,6 +2,7 @@
 using Core.Security.Basic;
 using Core.Security.Concrete;
 using Core.Security.Jwt;
+using Core.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -15,13 +16,11 @@ namespace Core.Security.Extantions
     {
         public static IServiceCollection AddBasicAuthDependency(this IServiceCollection services,Type AknUserType,List<string> IgnoreEndpoindNames =null)
         {
-            var aknUserTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => typeof(IAknUser).IsAssignableFrom(p) && !p.IsInterface)?.ToList(); ;
+            
+             var aknUserTypes = TypeUtilities.GetAllAssembysTypeFromAssignableInterface(typeof(IAknUser), true);
 
             if (aknUserTypes == null || !aknUserTypes.Any())
                 throw new System.Exception("aknUserTypes implement user type not found");
-
 
             if (AknUserType.GetInterfaces().Contains(typeof(IAknUser)))
                 services.AddScoped(typeof(IAknUser), AknUserType);
