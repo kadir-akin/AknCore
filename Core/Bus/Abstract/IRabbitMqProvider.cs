@@ -8,7 +8,7 @@ namespace Core.Bus.Abstract
 {
     public interface IRabbitMqProvider
     {
-        public IConnection GetConnection();
+        public ConnectionFactory GetConnectionFactory();
         public Task Publish(IBusMessage message);
         public Task Consume(Type consumeType);
     }

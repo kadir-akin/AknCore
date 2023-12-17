@@ -15,14 +15,13 @@ namespace Core.Bus.RabbitMq
     {
         private readonly IOptions<RabbitMqConfiguration> _options;
         private readonly IBusContext _busContext;
-        private  IConnection _connection;
         public RabbitMqProvider(IOptions<RabbitMqConfiguration> options, IBusContext busContext)
         {
             _options = options;
             _busContext = busContext;
         }
 
-        public IConnection GetConnection()
+        public ConnectionFactory GetConnectionFactory()
         {
             ConnectionFactory connectionFactory = new ConnectionFactory();
 
@@ -30,13 +29,12 @@ namespace Core.Bus.RabbitMq
             connectionFactory.HostName = _options.Value.HostName;
             connectionFactory.Port = Convert.ToInt32(_options.Value.Port);
             connectionFactory.Password = _options.Value.Password;
-
-            _connection= connectionFactory.CreateConnection();
-            return _connection;
+            return connectionFactory;
+            
         }
         public Task Publish(IBusMessage message)
         {
-            using (IConnection connection = GetConnection()) 
+            using (IConnection connection = GetConnectionFactory().CreateConnection()) 
             {
                 using (IModel channel = connection.CreateModel())
                 {
@@ -58,7 +56,7 @@ namespace Core.Bus.RabbitMq
 
         public Task Consume(Type consumeType)
         {
-            using (IConnection connection = GetConnection()) 
+            using (IConnection connection = GetConnectionFactory().CreateConnection()) 
             {
                 using (IModel channel = connection.CreateModel())
                 {
@@ -84,14 +82,6 @@ namespace Core.Bus.RabbitMq
            return Task.CompletedTask;
         }
 
-        public void ConnectionClose() 
-        {
-            if (_connection.IsOpen)
-            {
-                _connection.Close();
-            }
-
-           
-        }
+       
     }
 }
