@@ -10,5 +10,6 @@ namespace Core.Bus.Abstract
     {
         public IConnection GetConnection();
         public Task Publish(IBusMessage message);
+        public Task Consume(Type consumeType);
     }
 }
