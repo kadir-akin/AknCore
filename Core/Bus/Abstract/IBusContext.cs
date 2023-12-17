@@ -8,6 +8,8 @@ namespace Core.Bus.Abstract
     public interface IBusContext
     {
         public List<Type> AssembyBusMessageList { get; set; }
-        public Dictionary<Type, RabbitMqAttribute> RabbitMqAttributeValues { get; set; }
+        public List<RabbitMqContext> RabbitMqContextList { get; set; }
+
+        public RabbitMqContext GetRabbitMqContextFromBusMessageType(Type busMessageType);
     }
 }

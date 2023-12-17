@@ -17,6 +17,15 @@ namespace Core.Utilities
             return result;
         }
 
+        public static TObject ToObject<TObject>(this string message) 
+        {
 
+            if (string.IsNullOrEmpty(message))
+            {
+                return default(TObject);
+            }
+
+            return JsonConvert.DeserializeObject<TObject>(message);
+        }
     }
 }

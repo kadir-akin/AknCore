@@ -5,6 +5,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -36,7 +37,7 @@ namespace Core.Bus.RabbitMq
             using (IConnection connection = GetConnection())
             using (IModel channel = connection.CreateModel())
             {
-                var busMessageAtrtribute = _busContext.RabbitMqAttributeValues[message.GetType()];
+                var busMessageAtrtribute = _busContext.GetRabbitMqContextFromBusMessageType(message.GetType())?.Attribute;
                 channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
 
                 byte[] bytemessage = Encoding.UTF8.GetBytes(message.ToJson());
@@ -55,7 +56,8 @@ namespace Core.Bus.RabbitMq
             using (IConnection connection = GetConnection())
             using (IModel channel = connection.CreateModel())
             {
-                var busMessageAtrtribute = _busContext.RabbitMqAttributeValues[consumeType];
+                var context = _busContext.GetRabbitMqContextFromBusMessageType(consumeType);
+                var busMessageAtrtribute = context?.Attribute;
                 channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
                 channel.BasicQos(prefetchSize: busMessageAtrtribute.PrefetchSize, prefetchCount: busMessageAtrtribute.PrefetchCount, global: busMessageAtrtribute.Global);
 
@@ -64,11 +66,10 @@ namespace Core.Bus.RabbitMq
                 consumer.Received += (sender, e) =>
                 {
                     var body = e.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
-                   
+                    var message = Encoding.UTF8.GetString(body);                  
+                    context.ConsumeHandler.HandleAsync(message.ToObject<IBusMessage>());
                     channel.BasicAck(e.DeliveryTag, false);
-                };
-                Console.Read();
+                };               
             }
             return null;
         }
