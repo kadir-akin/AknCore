@@ -20,14 +20,16 @@ namespace Core.Bus.RabbitMq
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            await Task.Yield();
             while (!stoppingToken.IsCancellationRequested)
             {
-                Thread.Sleep(1000);
-               // _rabbitMqProvider.Consume(_busContext.RabbitMqContextList.FirstOrDefault().BusMessage);
+                
+               await _rabbitMqProvider.Consume(_busContext.RabbitMqContextList.FirstOrDefault().BusMessage);
             }
 
-
+               
             await StopAsync(stoppingToken);
+
         }
     }
 }

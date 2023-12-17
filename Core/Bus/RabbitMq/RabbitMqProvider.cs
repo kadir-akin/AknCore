@@ -36,52 +36,62 @@ namespace Core.Bus.RabbitMq
         }
         public Task Publish(IBusMessage message)
         {
-            using (IConnection connection = GetConnection())
-            using (IModel channel = connection.CreateModel())
+            using (IConnection connection = GetConnection()) 
             {
-                var busMessageAtrtribute = _busContext.GetRabbitMqContextFromBusMessageType(message.GetType())?.Attribute;
-                channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
+                using (IModel channel = connection.CreateModel())
+                {
+                    var busMessageAtrtribute = _busContext.GetRabbitMqContextFromBusMessageType(message.GetType())?.Attribute;
+                    channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
 
-                byte[] bytemessage = Encoding.UTF8.GetBytes(message.ToJson());
+                    byte[] bytemessage = Encoding.UTF8.GetBytes(message.ToJson());
 
-                IBasicProperties properties = channel.CreateBasicProperties();
-                properties.Persistent = busMessageAtrtribute.Persistent;
+                    IBasicProperties properties = channel.CreateBasicProperties();
+                    properties.Persistent = busMessageAtrtribute.Persistent;
 
-                channel.BasicPublish(exchange: "", routingKey: busMessageAtrtribute.Queue, basicProperties: properties, body: bytemessage);
-                ConnectionClose();
+                    channel.BasicPublish(exchange: "", routingKey: busMessageAtrtribute.Queue, basicProperties: properties, body: bytemessage);                 
+                }
             }
+          
 
             return null;
         }
 
         public Task Consume(Type consumeType)
         {
-            using (IConnection connection = GetConnection())
-            using (IModel channel = connection.CreateModel())
+            using (IConnection connection = GetConnection()) 
             {
-                var context = _busContext.GetRabbitMqContextFromBusMessageType(consumeType);
-                var busMessageAtrtribute = context?.Attribute;
-                channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
-                channel.BasicQos(prefetchSize: busMessageAtrtribute.PrefetchSize, prefetchCount: busMessageAtrtribute.PrefetchCount, global: busMessageAtrtribute.Global);
-
-                EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
-                channel.BasicConsume(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck, consumer);
-                consumer.Received += (sender, e) =>
+                using (IModel channel = connection.CreateModel())
                 {
-                    var body = e.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
-                    var convertMessage =message.ToBusObject(context.BusMessage);
-                    context.ConsumeHandler.HandleAsync(convertMessage);
-                    channel.BasicAck(e.DeliveryTag, false);
-                   
-                };
+                    var context = _busContext.GetRabbitMqContextFromBusMessageType(consumeType);
+                    var busMessageAtrtribute = context?.Attribute;
+                    channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
+                    channel.BasicQos(prefetchSize: busMessageAtrtribute.PrefetchSize, prefetchCount: busMessageAtrtribute.PrefetchCount, global: busMessageAtrtribute.Global);
+
+                    EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+                    channel.BasicConsume(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck, consumer);
+                    consumer.Received += (sender, e) =>
+                    {
+                        var body = e.Body.ToArray();
+                        var message = Encoding.UTF8.GetString(body);
+                        var convertMessage = message.ToBusObject(context.BusMessage);
+                        context.ConsumeHandler.HandleAsync(convertMessage);
+                        channel.BasicAck(e.DeliveryTag, false);
+
+                    };
+                }
             }
+          
            return Task.CompletedTask;
         }
 
         public void ConnectionClose() 
         {
-            _connection.Close();       
+            if (_connection.IsOpen)
+            {
+                _connection.Close();
+            }
+
+           
         }
     }
 }
