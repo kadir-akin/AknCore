@@ -64,6 +64,13 @@ namespace Template_Api
                 services.Configure<ElasticSearchConfiguration>(elasticConfig);
 
             }
+            var rabbitMqConfiguration = _configuration.GetSection("RabbitMqConfiguration");
+            if (rabbitMqConfiguration.Exists())
+            {
+                services.Configure<RabbitMqConfiguration>(rabbitMqConfiguration);
+
+            }
+
             services.AddAknMetricsDependency();
             services.AddAknValidationFilter();
             services.AddReqeustContextDependency(typeof(TestRequestContext));

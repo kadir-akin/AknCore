@@ -27,5 +27,10 @@ namespace Core.Utilities
 
             return JsonConvert.DeserializeObject<TObject>(message);
         }
+
+        public static IBusMessage ToBusObject(this string message,Type convertType) 
+        {
+          return  JsonConvert.DeserializeObject<IBusMessage>(message, BusMessageJsonConvertor.GetJsonSerializerSettings(convertType));
+        }
     }
 }

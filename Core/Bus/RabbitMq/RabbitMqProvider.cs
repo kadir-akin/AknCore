@@ -15,7 +15,8 @@ namespace Core.Bus.RabbitMq
     {
         private readonly IOptions<RabbitMqConfiguration> _options;
         private readonly IBusContext _busContext;
-        public RabbitMqProvider(IOptions<RabbitMqConfiguration> options,IBusContext busContext)
+        private  IConnection _connection;
+        public RabbitMqProvider(IOptions<RabbitMqConfiguration> options, IBusContext busContext)
         {
             _options = options;
             _busContext = busContext;
@@ -23,14 +24,15 @@ namespace Core.Bus.RabbitMq
 
         public IConnection GetConnection()
         {
-            ConnectionFactory connectionFactory = new ConnectionFactory()
-            {
-                UserName = _options.Value.UserName,
-                HostName = _options.Value.HostName,
-                Port = Convert.ToInt32(_options.Value.Port),
-                Password = _options.Value.Password,
-            };
-            return connectionFactory.CreateConnection();
+            ConnectionFactory connectionFactory = new ConnectionFactory();
+
+            connectionFactory.UserName = _options.Value.UserName;
+            connectionFactory.HostName = _options.Value.HostName;
+            connectionFactory.Port = Convert.ToInt32(_options.Value.Port);
+            connectionFactory.Password = _options.Value.Password;
+
+            _connection= connectionFactory.CreateConnection();
+            return _connection;
         }
         public Task Publish(IBusMessage message)
         {
@@ -45,13 +47,14 @@ namespace Core.Bus.RabbitMq
                 IBasicProperties properties = channel.CreateBasicProperties();
                 properties.Persistent = busMessageAtrtribute.Persistent;
 
-                channel.BasicPublish(exchange: "", routingKey: busMessageAtrtribute.Queue, basicProperties: properties, body: bytemessage);               
+                channel.BasicPublish(exchange: "", routingKey: busMessageAtrtribute.Queue, basicProperties: properties, body: bytemessage);
+                ConnectionClose();
             }
 
             return null;
         }
 
-        public Task Consume(Type consumeType) 
+        public Task Consume(Type consumeType)
         {
             using (IConnection connection = GetConnection())
             using (IModel channel = connection.CreateModel())
@@ -66,12 +69,19 @@ namespace Core.Bus.RabbitMq
                 consumer.Received += (sender, e) =>
                 {
                     var body = e.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);                  
-                    context.ConsumeHandler.HandleAsync(message.ToObject<IBusMessage>());
+                    var message = Encoding.UTF8.GetString(body);
+                    var convertMessage =message.ToBusObject(context.BusMessage);
+                    context.ConsumeHandler.HandleAsync(convertMessage);
                     channel.BasicAck(e.DeliveryTag, false);
-                };               
+                   
+                };
             }
-            return null;
+           return Task.CompletedTask;
+        }
+
+        public void ConnectionClose() 
+        {
+            _connection.Close();       
         }
     }
 }

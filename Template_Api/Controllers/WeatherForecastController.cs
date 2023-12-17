@@ -1,4 +1,5 @@
-﻿using Core.Elastic.Abstract;
+﻿using Core.Bus.Abstract;
+using Core.Elastic.Abstract;
 using Core.LogAkn.Abstract;
 using Core.LogAkn.Extantions;
 using Core.Security.Abstract;
@@ -22,15 +23,15 @@ namespace Template_Api.Controllers
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-        private static readonly Counter LogicInvocationCounter = Metrics
-               .CreateCounter("logic_invocation", "Number of invoked jobs.");
+        };      
         private readonly ILogService _logService;
         private readonly IAknUser _aknUser;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser)
+        private readonly IRabbitMqProvider _rabbitMqProvider;
+        public WeatherForecastController( ILogService logService, IAknUser aknUser, IRabbitMqProvider rabbitMqProvider)
         {     
             _logService = logService;
            _aknUser = aknUser;
+            _rabbitMqProvider = rabbitMqProvider;
         }
 
 
@@ -44,9 +45,10 @@ namespace Template_Api.Controllers
         [AknAuthorizationFilter("TESTROLE")]
         public async Task<object> abc([FromBody] TestInputObject test)
         {
-            LogicInvocationCounter.Inc();
-            var userhttpContext = HttpContext.User;
-            var threadUser = AknUserUtilities.GetCurrentUser();
+            _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "denme verisi girrildi " });
+        
+            //var userhttpContext = HttpContext.User;
+            //var threadUser = AknUserUtilities.GetCurrentUser();
             //await _elasticSearchProvider.ChekIndex();
             //var id = Guid.NewGuid().ToString();
             //await _elasticSearchProvider.InsertDocument(new ElasticSearchTestobject()
@@ -59,21 +61,21 @@ namespace Template_Api.Controllers
             //_logger.LogInformation("test deneme logu info");
             //_logger.LogError("test deneme logu error");
             //_logger.LogWarning("test deneme logu warning");
-            int userID = 0;
+            //int userID = 0;
 
-            if (_aknUser is AknUser user)
-            {
-                userID = user.UserId;
-            }
+            //if (_aknUser is AknUser user)
+            //{
+            //    userID = user.UserId;
+            //}
 
-            _logService.LogInformationAsync("{0} logu eklendi user Id :{1}","Kadir akın", userID);
+            //_logService.LogInformationAsync("{0} logu eklendi user Id :{1}","Kadir akın", userID);
             return Summaries;
         }
 
         [HttpPost]
         public IEnumerable<object> Login([FromBody] TestInputObject test)
         {
-
+           
             return Summaries;
         }
     }

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,19 +13,21 @@ namespace Core.Bus.RabbitMq
     {
         private readonly IRabbitMqProvider _rabbitMqProvider;
         private readonly IBusContext _busContext;
-        public RabbitMqBackgroundService(IRabbitMqProvider rabbitMqProvider, IBusContext busContext)
+        public RabbitMqBackgroundService(IServiceProvider serviceProvider, IBusContext busContext)
         {
-            _rabbitMqProvider = rabbitMqProvider;
+            _rabbitMqProvider = (IRabbitMqProvider)serviceProvider.GetService(typeof(IRabbitMqProvider));
             _busContext = busContext;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                //_rabbitMqProvider.Consume();
-                await StopAsync(stoppingToken);
-
+                Thread.Sleep(1000);
+               // _rabbitMqProvider.Consume(_busContext.RabbitMqContextList.FirstOrDefault().BusMessage);
             }
+
+
+            await StopAsync(stoppingToken);
         }
     }
 }

@@ -13,9 +13,9 @@ namespace Template_Api
             return Task.FromResult(result);
         }
     }
-    [RabbitMq("test",false,false,false,false,"test",1,1,false,false)]
+    [RabbitMq("test", "test")]
     public class BusMessageTest :IBusMessage
-    { 
-    
+    {
+        public string Deneme { get; set; }
     }
 }

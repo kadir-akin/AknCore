@@ -19,7 +19,8 @@ namespace Core.Bus.Extantions
             var rabbitMqContextList = GetRabbitMqContexts(busMessageListType, consumeHandlerListType, services.BuildServiceProvider());
             
             services.AddSingleton(typeof(IBusContext), new BusContext(busMessageListType, rabbitMqContextList));
-            services.AddScoped<IRabbitMqProvider, RabbitMqProvider>();
+            services.AddSingleton<IRabbitMqProvider, RabbitMqProvider>();
+            services.AddHostedService<RabbitMqBackgroundService>();
             return services;
         }
 
