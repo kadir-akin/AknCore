@@ -26,8 +26,8 @@ namespace Template_Api.Controllers
         };      
         private readonly ILogService _logService;
         private readonly IAknUser _aknUser;
-        private readonly IRabbitMqProvider _rabbitMqProvider;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser, IRabbitMqProvider rabbitMqProvider)
+        private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
+        public WeatherForecastController( ILogService logService, IAknUser aknUser, IRabbitMqProvider<BusMessageTest> rabbitMqProvider)
         {     
             _logService = logService;
            _aknUser = aknUser;
@@ -45,7 +45,7 @@ namespace Template_Api.Controllers
         [AknAuthorizationFilter("TESTROLE")]
         public async Task<object> abc([FromBody] TestInputObject test)
         {
-            _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "denme verisi girrildi " });
+            _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "denme verisi girrildi  " +Guid.NewGuid().ToString() });
         
             //var userhttpContext = HttpContext.User;
             //var threadUser = AknUserUtilities.GetCurrentUser();

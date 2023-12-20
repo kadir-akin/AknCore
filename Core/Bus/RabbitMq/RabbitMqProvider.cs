@@ -11,14 +11,20 @@ using System.Threading.Tasks;
 
 namespace Core.Bus.RabbitMq
 {
-    public class RabbitMqProvider : IRabbitMqProvider
+    public class RabbitMqProvider<T> : IRabbitMqProvider<T> where T : class, IBusMessage
     {
         private readonly IOptions<RabbitMqConfiguration> _options;
         private readonly IBusContext _busContext;
+        public RabbitMqContext RabbitMqContext { get; set; }
+
+        public IModel ConsumeChannel { get; set; }
+
+        public IConnection ConsumeConnection { get; set; }
         public RabbitMqProvider(IOptions<RabbitMqConfiguration> options, IBusContext busContext)
         {
             _options = options;
             _busContext = busContext;
+            RabbitMqContext = _busContext.GetRabbitMqContextFromBusMessageType(typeof(T));
         }
 
         public ConnectionFactory GetConnectionFactory()
@@ -30,15 +36,15 @@ namespace Core.Bus.RabbitMq
             connectionFactory.Port = Convert.ToInt32(_options.Value.Port);
             connectionFactory.Password = _options.Value.Password;
             return connectionFactory;
-            
+
         }
-        public Task Publish(IBusMessage message)
+        public Task Publish(T message)
         {
-            using (IConnection connection = GetConnectionFactory().CreateConnection()) 
+            using (IConnection connection = GetConnectionFactory().CreateConnection())
             {
                 using (IModel channel = connection.CreateModel())
                 {
-                    var busMessageAtrtribute = _busContext.GetRabbitMqContextFromBusMessageType(message.GetType())?.Attribute;
+                    var busMessageAtrtribute = RabbitMqContext?.Attribute;
                     channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
 
                     byte[] bytemessage = Encoding.UTF8.GetBytes(message.ToJson());
@@ -46,42 +52,56 @@ namespace Core.Bus.RabbitMq
                     IBasicProperties properties = channel.CreateBasicProperties();
                     properties.Persistent = busMessageAtrtribute.Persistent;
 
-                    channel.BasicPublish(exchange: "", routingKey: busMessageAtrtribute.Queue, basicProperties: properties, body: bytemessage);                 
+                    channel.BasicPublish(exchange: "", routingKey: busMessageAtrtribute.Queue, basicProperties: properties, body: bytemessage);
                 }
             }
-          
+
 
             return null;
         }
 
-        public Task Consume(Type consumeType)
+        public Task Consume()
         {
-            using (IConnection connection = GetConnectionFactory().CreateConnection()) 
+            using (ConsumeConnection = GetConnectionFactory().CreateConnection())
             {
-                using (IModel channel = connection.CreateModel())
+                using (ConsumeChannel = ConsumeConnection.CreateModel())
                 {
-                    var context = _busContext.GetRabbitMqContextFromBusMessageType(consumeType);
-                    var busMessageAtrtribute = context?.Attribute;
-                    channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
-                    channel.BasicQos(prefetchSize: busMessageAtrtribute.PrefetchSize, prefetchCount: busMessageAtrtribute.PrefetchCount, global: busMessageAtrtribute.Global);
+                    var busMessageAtrtribute = RabbitMqContext?.Attribute;
+                    ConsumeChannel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
+                    ConsumeChannel.BasicQos(prefetchSize: busMessageAtrtribute.PrefetchSize, prefetchCount: busMessageAtrtribute.PrefetchCount, global: busMessageAtrtribute.Global);
 
-                    EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
-                    channel.BasicConsume(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck, consumer);
-                    consumer.Received += (sender, e) =>
-                    {
-                        var body = e.Body.ToArray();
-                        var message = Encoding.UTF8.GetString(body);
-                        var convertMessage = message.ToBusObject(context.BusMessage);
-                        context.ConsumeHandler.HandleAsync(convertMessage);
-                        channel.BasicAck(e.DeliveryTag, false);
-
-                    };
+                    EventingBasicConsumer consumer = new EventingBasicConsumer(ConsumeChannel);
+                    ConsumeChannel.BasicConsume(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck, consumer);
+                    
+                    consumer.Received += HandleMessageReceived;
+                    //consumer.Registered += ConsumerRegistered;
                 }
             }
-          
-           return Task.CompletedTask;
+
+            return Task.CompletedTask;
         }
 
-       
+        private void ConsumerRegistered(object sender, ConsumerEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void HandleMessageReceived(object sender, BasicDeliverEventArgs e)
+        {
+            lock (ConsumeConnection)
+            {
+                lock (ConsumeChannel)
+                {
+                    var body = e.Body.ToArray();
+                    var message = Encoding.UTF8.GetString(body);
+                    var convertMessage = message.ToBusObject(RabbitMqContext?.BusMessage);
+                    RabbitMqContext?.ConsumeHandler.HandleAsync(convertMessage);
+                    ConsumeChannel.BasicAck(e.DeliveryTag, false);
+                }
+            }
+           
+
+
+        }
     }
 }

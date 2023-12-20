@@ -82,7 +82,7 @@ namespace Template_Api
            
             services.AddLocalizationService();                                
             services.AddAknLogDependency();
-            services.AddBusDependency();
+            services.AddBusDependency<BusMessageTest>();
 
 
 

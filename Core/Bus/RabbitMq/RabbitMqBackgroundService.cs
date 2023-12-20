@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Core.Bus.RabbitMq
 {
-    public class RabbitMqBackgroundService : BackgroundService
+    public class RabbitMqBackgroundService<T> : BackgroundService where T : class,IBusMessage
     {
-        private readonly IRabbitMqProvider _rabbitMqProvider;
+        private readonly IRabbitMqProvider<T> _rabbitMqProvider;
         private readonly IBusContext _busContext;
         public RabbitMqBackgroundService(IServiceProvider serviceProvider, IBusContext busContext)
         {
-            _rabbitMqProvider = (IRabbitMqProvider)serviceProvider.GetService(typeof(IRabbitMqProvider));
+            _rabbitMqProvider = (IRabbitMqProvider<T>)serviceProvider.GetService(typeof(IRabbitMqProvider<T>));
             _busContext = busContext;
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -24,7 +24,7 @@ namespace Core.Bus.RabbitMq
             while (!stoppingToken.IsCancellationRequested)
             {
                 
-               await _rabbitMqProvider.Consume(_busContext.RabbitMqContextList.FirstOrDefault().BusMessage);
+               await _rabbitMqProvider.Consume();
             }
 
                

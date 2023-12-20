@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Core.Bus.RabbitMq;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -6,10 +7,14 @@ using System.Threading.Tasks;
 
 namespace Core.Bus.Abstract
 {
-    public interface IRabbitMqProvider
+    public interface IRabbitMqProvider<T> where T : class,IBusMessage
     {
         public ConnectionFactory GetConnectionFactory();
-        public Task Publish(IBusMessage message);
-        public Task Consume(Type consumeType);
+        public Task Publish(T message);
+        public Task Consume();
+
+
+        public RabbitMqContext RabbitMqContext { get; set; }
+        public IModel ConsumeChannel { get; set; }
     }
 }
