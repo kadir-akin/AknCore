@@ -16,10 +16,6 @@ namespace Core.Bus.RabbitMq
         private readonly IOptions<RabbitMqConfiguration> _options;
         private readonly IBusContext _busContext;
         public RabbitMqContext RabbitMqContext { get; set; }
-
-        public IModel ConsumeChannel { get; set; }
-
-        public IConnection ConsumeConnection { get; set; }
         public RabbitMqProvider(IOptions<RabbitMqConfiguration> options, IBusContext busContext)
         {
             _options = options;
@@ -62,45 +58,44 @@ namespace Core.Bus.RabbitMq
 
         public Task Consume()
         {
-            using (ConsumeConnection = GetConnectionFactory().CreateConnection())
+            
+            using (IConnection connection = GetConnectionFactory().CreateConnection())
             {
-                using (ConsumeChannel = ConsumeConnection.CreateModel())
+                using (IModel channel = connection.CreateModel())
                 {
-                    var busMessageAtrtribute = RabbitMqContext?.Attribute;
-                    ConsumeChannel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
-                    ConsumeChannel.BasicQos(prefetchSize: busMessageAtrtribute.PrefetchSize, prefetchCount: busMessageAtrtribute.PrefetchCount, global: busMessageAtrtribute.Global);
+                    var busMessageAtrtribute = RabbitMqContext?.Attribute;                                  
+                    channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
+                    channel.BasicQos(prefetchSize: busMessageAtrtribute.PrefetchSize, prefetchCount: busMessageAtrtribute.PrefetchCount, global: busMessageAtrtribute.Global);
 
-                    EventingBasicConsumer consumer = new EventingBasicConsumer(ConsumeChannel);
-                    ConsumeChannel.BasicConsume(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck, consumer);
+                    EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+                    channel.BasicConsume(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck, consumer);
                     
-                    consumer.Received += HandleMessageReceived;
-                    //consumer.Registered += ConsumerRegistered;
+                    BasicGetResult result = channel.BasicGet(busMessageAtrtribute.Queue, false);
+                    if (result != null)
+                    {
+                        var body = result.Body.ToArray();
+                        var message = Encoding.UTF8.GetString(body);
+                        var convertMessage = message.ToBusObject(RabbitMqContext?.BusMessage);
+                        RabbitMqContext?.ConsumeHandler.HandleAsync(convertMessage);                       
+                        channel.BasicAck(result.DeliveryTag, false);                        
+                    }
                 }
             }
 
             return Task.CompletedTask;
         }
-
-        private void ConsumerRegistered(object sender, ConsumerEventArgs e)
+      
+        public Task<uint> MessageCount()
         {
-            //throw new NotImplementedException();
-        }
-
-        private void HandleMessageReceived(object sender, BasicDeliverEventArgs e)
-        {
-            lock (ConsumeConnection)
+            using (IConnection connection = GetConnectionFactory().CreateConnection())
             {
-                lock (ConsumeChannel)
+                using (IModel channel = connection.CreateModel())
                 {
-                    var body = e.Body.ToArray();
-                    var message = Encoding.UTF8.GetString(body);
-                    var convertMessage = message.ToBusObject(RabbitMqContext?.BusMessage);
-                    RabbitMqContext?.ConsumeHandler.HandleAsync(convertMessage);
-                    ConsumeChannel.BasicAck(e.DeliveryTag, false);
+                    var busMessageAtrtribute = RabbitMqContext?.Attribute;
+                    var messageCount =channel.MessageCount(busMessageAtrtribute.Queue);
+                    return Task.FromResult( messageCount);
                 }
             }
-           
-
 
         }
     }

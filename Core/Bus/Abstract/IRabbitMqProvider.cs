@@ -13,8 +13,7 @@ namespace Core.Bus.Abstract
         public Task Publish(T message);
         public Task Consume();
 
+        public Task<uint> MessageCount();
 
-        public RabbitMqContext RabbitMqContext { get; set; }
-        public IModel ConsumeChannel { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace Template_Api
         public override Task ConsumeHandleAsync(BusMessageTest message)
         {
             var result = JsonConvert.SerializeObject(message);
-            _logService.LogDebug(result);
+            _logService.LogInformationAsync(result);
             return Task.FromResult(result);
         }
     }

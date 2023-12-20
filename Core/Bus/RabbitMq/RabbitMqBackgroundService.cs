@@ -21,14 +21,23 @@ namespace Core.Bus.RabbitMq
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             await Task.Yield();
+            
+            if (await _rabbitMqProvider.MessageCount() == 0)
+            {
+                 await Task.Delay(5000);
+            }
+             
+             await HandleConsumer(stoppingToken);
+             await StopAsync(stoppingToken);
+
+        }
+
+        private async Task HandleConsumer(CancellationToken stoppingToken) 
+        {
             while (!stoppingToken.IsCancellationRequested)
             {
-                
-               await _rabbitMqProvider.Consume();
-            }
-
-               
-            await StopAsync(stoppingToken);
+                await _rabbitMqProvider.Consume();
+            }            
 
         }
     }
