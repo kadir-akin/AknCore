@@ -18,7 +18,7 @@ namespace Core.Bus.RabbitMq
         public bool Global { get; set; }
 
         public bool AutoAck { get; set; }
-        public RabbitMqAttribute(string queue, string rountingKey,bool durable=false,bool exclusive=false,bool autoDelete=false,bool persistent=true, uint prefetchSize=0,ushort prefetchCount=1,bool global=false, bool autoAck=false)
+        public RabbitMqAttribute(string queue, string rountingKey, bool autoAck = false,bool durable=false,bool exclusive=false,bool autoDelete=false,bool persistent=true, uint prefetchSize=0,ushort prefetchCount=1,bool global=false)
         {
             Queue = queue;
             Exclusive = exclusive;

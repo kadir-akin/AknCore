@@ -70,14 +70,14 @@ namespace Core.Bus.RabbitMq
                     EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
                     channel.BasicConsume(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck, consumer);
                     
-                    BasicGetResult result = channel.BasicGet(busMessageAtrtribute.Queue, false);
+                    BasicGetResult result = channel.BasicGet(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck);
                     if (result != null)
                     {
                         var body = result.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
                         var convertMessage = message.ToBusObject(RabbitMqContext?.BusMessage);
                         RabbitMqContext?.ConsumeHandler.HandleAsync(convertMessage);                       
-                        channel.BasicAck(result.DeliveryTag, false);                        
+                        //channel.BasicAck(result.DeliveryTag, false);                        
                     }
                 }
             }
