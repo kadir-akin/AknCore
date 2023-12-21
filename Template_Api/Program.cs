@@ -19,7 +19,8 @@ namespace Template_Api
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
-                {                 
+                {
+                    webBuilder.ConfigureKestrel(x => x.AllowSynchronousIO = true);
                     webBuilder.UseStartup<Startup>();
                 });
     }
