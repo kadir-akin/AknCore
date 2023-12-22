@@ -30,15 +30,7 @@ namespace Core.Infrastructure.Extantions
            
             
             var aknInterfacePropertyList = typeof(IAknRequestContext).GetProperties()?.ToList();
-
-            var _configuration = services.BuildServiceProvider().GetService<IConfiguration>();
-            var projectInfoConfiguration = _configuration.GetSection("ProjectInfoConfiguration");
-            
-            if (projectInfoConfiguration.Exists())
-                 services.Configure<ProjectInfoConfiguration>(projectInfoConfiguration);
-            else
-                throw new System.Exception("ProjectInfoConfiguration not found");
-
+          
             services.AddSingleton(typeof(IAknRequestContextImplementTypes), new AknRequestContextImplementTypes(aknRequestContextTypes?.ToList(), aknInterfacePropertyList));
          
             return services;

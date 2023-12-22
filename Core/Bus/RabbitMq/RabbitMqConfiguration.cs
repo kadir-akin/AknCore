@@ -13,5 +13,7 @@ namespace Core.Bus.RabbitMq
         public string Password { get; set; }
 
         public string Port { get; set; }
+
+        public bool CosumerTaskDelayEnable { get; set; }
     }
 }

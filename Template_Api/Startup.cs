@@ -10,6 +10,7 @@ using Core.LogAkn.Abstract;
 using Core.LogAkn.Concrate;
 using Core.LogAkn.Extantions;
 using Core.Metric.Extantions;
+using Core.Project.Extantions;
 using Core.RequestContext.Concrate;
 using Core.Security.Abstract;
 using Core.Security.Basic;
@@ -43,7 +44,7 @@ namespace Template_Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           
+            services.AddProjectInformation();
             services.AddAknMetricsDependency();
             services.AddAknValidationFilter();
             services.AddReqeustContextDependency(typeof(TestRequestContext));
@@ -52,7 +53,9 @@ namespace Template_Api
             services.AddControllers();                    
             services.AddLocalizationService();                                
             services.AddAknLogDependency();
-            services.AddRabbitBus().RabbitMqSubcribe<BusMessageTest>();
+            services.AddRabbitBus()
+                .RabbitMqSubcribeAndPublish<BusMessageTest>()
+                .RabbitMqPublish<DenemeMessageTest>();
 
 
 

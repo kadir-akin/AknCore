@@ -27,13 +27,11 @@ namespace Template_Api.Controllers
         private readonly ILogService _logService;
         private readonly IAknUser _aknUser;
         private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
-        private readonly IRabbitMqProvider<DenemeMessageTest> _denemeRabbitMq;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser, IRabbitMqProvider<BusMessageTest> rabbitMqProvider, IRabbitMqProvider<DenemeMessageTest> denemeRabbitMq)
+        public WeatherForecastController( ILogService logService, IAknUser aknUser, IRabbitMqProvider<BusMessageTest> rabbitMqProvider)
         {     
             _logService = logService;
            _aknUser = aknUser;
             _rabbitMqProvider = rabbitMqProvider;
-            _denemeRabbitMq = denemeRabbitMq;
         }
 
 
@@ -48,7 +46,6 @@ namespace Template_Api.Controllers
         public async Task<object> abc([FromBody] TestInputObject test)
         {
             _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " +Guid.NewGuid().ToString() });
-            _denemeRabbitMq.Publish(new DenemeMessageTest() { Deneme = "Deneme verisi girrildi  " + Guid.NewGuid().ToString() });
             //var userhttpContext = HttpContext.User;
             //var threadUser = AknUserUtilities.GetCurrentUser();
             //await _elasticSearchProvider.ChekIndex();

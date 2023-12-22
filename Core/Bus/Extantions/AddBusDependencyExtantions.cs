@@ -29,16 +29,15 @@ namespace Core.Bus.Extantions
             var consumeHandlerListType = TypeUtilities.GetAllAssembysTypeFromAssignableInterface(typeof(IConsumeHandler), true);
             var rabbitMqContextList = GetRabbitMqContexts(busMessageListType, consumeHandlerListType, services.BuildServiceProvider());
             services.AddSingleton(typeof(IBusContext), new BusContext(busMessageListType, rabbitMqContextList));
-
+          
             return services;
         }
-        public static IServiceCollection AddRabbitBus<T>(this IServiceCollection services) where T : class, IBusMessage
+        public static IServiceCollection RabbitMqPublish<T>(this IServiceCollection services) where T : class, IBusMessage
         {
-            AddRabbitBus(services);
             services.AddTransient<IRabbitMqProvider<T>, RabbitMqProvider<T>>();
             return services;
         }
-        public static IServiceCollection RabbitMqSubcribe<T>(this IServiceCollection services) where T : class, IBusMessage 
+        public static IServiceCollection RabbitMqSubcribeAndPublish<T>(this IServiceCollection services) where T : class, IBusMessage 
         {
             services.AddTransient<IRabbitMqProvider<T>, RabbitMqProvider<T>>();
             services.AddHostedService<RabbitMqBackgroundService<T>>();

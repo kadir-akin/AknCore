@@ -1,6 +1,7 @@
 ﻿using Core.Bus.Abstract;
 using Core.LogAkn.Abstract;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +16,11 @@ namespace Core.Bus.RabbitMq
         private readonly IRabbitMqProvider<T> _rabbitMqProvider;
         private readonly IBusContext _busContext;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IOptions<RabbitMqConfiguration> _configuration;
         public RabbitMqBackgroundService(IServiceProvider serviceProvider, IBusContext busContext)
         {
             _rabbitMqProvider = (IRabbitMqProvider<T>)serviceProvider.GetService(typeof(IRabbitMqProvider<T>));
+            _configuration = (IOptions<RabbitMqConfiguration>)serviceProvider.GetService(typeof(IOptions<RabbitMqConfiguration>));
             _busContext = busContext;   
             _serviceProvider = serviceProvider;
         }
@@ -41,13 +44,23 @@ namespace Core.Bus.RabbitMq
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                if (await _rabbitMqProvider.MessageCount() == 0)
+                if (await DoesntHaveMessageCount())
                 {
                     await Task.Delay(1000);
                 }
                 await _rabbitMqProvider.Consume();
             }            
 
+        }
+
+        private async Task<bool> DoesntHaveMessageCount() 
+        {
+            if (_configuration.Value.CosumerTaskDelayEnable && await _rabbitMqProvider.MessageCount() == 0 )
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
