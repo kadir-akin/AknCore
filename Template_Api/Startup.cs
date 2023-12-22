@@ -52,7 +52,7 @@ namespace Template_Api
             services.AddControllers();                    
             services.AddLocalizationService();                                
             services.AddAknLogDependency();
-            services.AddRabbitBus<BusMessageTest>().RabbitMqSubcribe<BusMessageTest>();
+            services.AddRabbitBus().RabbitMqSubcribe<BusMessageTest>();
 
 
 
