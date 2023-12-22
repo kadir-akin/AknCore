@@ -1,4 +1,5 @@
-﻿using Core.LogAkn.Abstract;
+﻿using Core.Exception.Concrate;
+using Core.LogAkn.Abstract;
 using Core.LogAkn.Extantions;
 using Core.ResultModel;
 using Core.Utilities;
@@ -53,9 +54,15 @@ namespace Core.Exception
                 aknException = new AknException(exception);
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
+            
+            logService.LogErrorAsync(aknException, aknException?.Message);          
+            var resulModel = new ErrorResult<List<AknExceptionModel>>
+                (
+                aknException.ExceptionDetailList?.Select(x=> new AknExceptionModel(x))?.ToList(),
+                aknException.ExceptionDetailList.FirstOrDefault().Status,
+                aknException.ExceptionDetailList.FirstOrDefault().Message
+                );
 
-            var resulModel= new ErrorResult<List<AknExceptionDetail>>(aknException.ExceptionDetailList, aknException.ExceptionDetailList.FirstOrDefault().Status, aknException.ExceptionDetailList.FirstOrDefault().Message);
-            logService.LogErrorAsync(aknException, aknException?.Message);                                  
             return context.Response.WriteAsync(Newtonsoft.Json.JsonConvert.SerializeObject(resulModel));
         }
     }
