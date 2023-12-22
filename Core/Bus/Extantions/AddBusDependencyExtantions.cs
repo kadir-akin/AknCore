@@ -11,19 +11,28 @@ using System.Text;
 namespace Core.Bus.Extantions
 {
     public static class AddBusDependencyExtantions
-    {
-        public static IServiceCollection AddBusDependency<T>(this IServiceCollection services) where T : class,IBusMessage
+    {       
+        public static IServiceCollection AddRabbitBus(this IServiceCollection services) 
         {
             var busMessageListType = TypeUtilities.GetAllAssembysTypeFromAssignableInterface(typeof(IBusMessage), true);
             var consumeHandlerListType = TypeUtilities.GetAllAssembysTypeFromAssignableInterface(typeof(IConsumeHandler), true);
             var rabbitMqContextList = GetRabbitMqContexts(busMessageListType, consumeHandlerListType, services.BuildServiceProvider());
-            
             services.AddSingleton(typeof(IBusContext), new BusContext(busMessageListType, rabbitMqContextList));
-            services.AddSingleton<IRabbitMqProvider<T>, RabbitMqProvider<T>>();
+
+            return services;
+        }
+        public static IServiceCollection AddRabbitBus<T>(this IServiceCollection services) where T : class, IBusMessage
+        {
+            AddRabbitBus(services);
+            services.AddTransient<IRabbitMqProvider<T>, RabbitMqProvider<T>>();
+            return services;
+        }
+        public static IServiceCollection RabbitMqSubcribe<T>(this IServiceCollection services) where T : class, IBusMessage 
+        {
+            services.AddTransient<IRabbitMqProvider<T>, RabbitMqProvider<T>>();
             services.AddHostedService<RabbitMqBackgroundService<T>>();
             return services;
         }
-
         private static List<RabbitMqContext> GetRabbitMqContexts(List<Type> BusMessageTypes, List<Type> consumeHandler,IServiceProvider serviceProvider)
         {
             var results = new List<RabbitMqContext>();

@@ -43,9 +43,6 @@ namespace Core.LogAkn.LoggerAkn
         
         public Task LogAsync(LogLevel logLevel, EventId eventId, System.Exception exception, string message, params object[] args)
         {
-            if (_httpContext.HttpContext == null)
-                return Task.CompletedTask;
-
             if (args != null && args.Any())
             {
                 message = string.Format(message, args);

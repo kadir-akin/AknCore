@@ -56,7 +56,7 @@ namespace Core.Bus.RabbitMq
             return null;
         }
 
-        public Task Consume()
+        public async Task Consume()
         {
             
             using (IConnection connection = GetConnectionFactory().CreateConnection())
@@ -67,22 +67,19 @@ namespace Core.Bus.RabbitMq
                     channel.QueueDeclare(busMessageAtrtribute.Queue, busMessageAtrtribute.Durable, busMessageAtrtribute.Exclusive, busMessageAtrtribute.AutoDelete, null);
                     channel.BasicQos(prefetchSize: busMessageAtrtribute.PrefetchSize, prefetchCount: busMessageAtrtribute.PrefetchCount, global: busMessageAtrtribute.Global);
 
-                    EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
-                    channel.BasicConsume(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck, consumer);
-                    
+                    //EventingBasicConsumer consumer = new EventingBasicConsumer(channel);
+                    //channel.BasicConsume(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck, consumer);            
                     BasicGetResult result = channel.BasicGet(busMessageAtrtribute.Queue, busMessageAtrtribute.AutoAck);
                     if (result != null)
                     {
                         var body = result.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
                         var convertMessage = message.ToBusObject(RabbitMqContext?.BusMessage);
-                        RabbitMqContext?.ConsumeHandler.HandleAsync(convertMessage);                       
+                        await RabbitMqContext?.ConsumeHandler.HandleAsync(convertMessage);                       
                         //channel.BasicAck(result.DeliveryTag, false);                        
                     }
                 }
             }
-
-            return Task.CompletedTask;
         }
       
         public Task<uint> MessageCount()

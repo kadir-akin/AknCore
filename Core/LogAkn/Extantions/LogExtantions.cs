@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
-namespace Core.LogAkn.Extantions
+namespace Core.LogAkn.Abstract
 {
     public static class LogExtantions
     {
