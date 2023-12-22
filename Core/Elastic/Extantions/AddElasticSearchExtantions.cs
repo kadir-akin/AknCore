@@ -16,13 +16,9 @@ namespace Core.Elastic.Extantions
             var _configuration = services.BuildServiceProvider().GetService<IConfiguration>();
             var elasticConfig = _configuration.GetSection("ElasticSearchConfiguration");
             if (elasticConfig.Exists())
-            {
-                // services.Configure<ElasticSearchConfiguration>(elasticConfig);
-            }
+                 services.Configure<ElasticSearchConfiguration>(elasticConfig);
             else
-            {
                 throw new System.Exception("ElasticSearchConfiguration Not Found");
-            }
 
             services.AddScoped(typeof(IElasticSearchProvider<>), typeof(ElasticSearchProvider<>));
 

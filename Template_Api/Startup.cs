@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Prometheus;
 using System.Collections.Generic;
 using System.IO;
@@ -42,48 +43,16 @@ namespace Template_Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var projectInfoConfiguration = _configuration.GetSection("ProjectInfoConfiguration");
-            if (projectInfoConfiguration.Exists())
-                services.Configure<ProjectInfoConfiguration>(projectInfoConfiguration);
-
-
-            var logConfigurationsection = _configuration.GetSection("LogConfiguration");
-            if (logConfigurationsection.Exists())
-                services.Configure<LogConfiguration>(logConfigurationsection);
-
-
-            var basicAuthConfiguration = _configuration.GetSection("BasicAuthConfiguration");
-            if (basicAuthConfiguration.Exists())
-            {
-                services.Configure<BasicAuthConfiguration>(basicAuthConfiguration);
-            }
-
-            var elasticConfig = _configuration.GetSection("ElasticSearchConfiguration");
-            if (elasticConfig.Exists())
-            {
-                services.Configure<ElasticSearchConfiguration>(elasticConfig);
-
-            }
-            var rabbitMqConfiguration = _configuration.GetSection("RabbitMqConfiguration");
-            if (rabbitMqConfiguration.Exists())
-            {
-                services.Configure<RabbitMqConfiguration>(rabbitMqConfiguration);
-
-            }
-
+           
             services.AddAknMetricsDependency();
             services.AddAknValidationFilter();
             services.AddReqeustContextDependency(typeof(TestRequestContext));
             services.AddBasicAuthDependency(typeof(AknUser));                      
-            services.AddElasticSearch();
-           
-            
-            services.AddControllers();          
-           
+            services.AddElasticSearch();                       
+            services.AddControllers();                    
             services.AddLocalizationService();                                
             services.AddAknLogDependency();
-            services.AddRabbitBus<BusMessageTest>()             
-                .RabbitMqSubcribe<DenemeMessageTest>();
+            services.AddRabbitBus<BusMessageTest>().RabbitMqSubcribe<BusMessageTest>();
 
 
 

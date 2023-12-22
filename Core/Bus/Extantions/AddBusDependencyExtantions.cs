@@ -2,6 +2,7 @@
 using Core.Bus.Concrate;
 using Core.Bus.RabbitMq;
 using Core.Utilities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,16 @@ namespace Core.Bus.Extantions
     {       
         public static IServiceCollection AddRabbitBus(this IServiceCollection services) 
         {
+            
+            var _configuration = (IConfiguration)services.BuildServiceProvider().GetService(typeof(IConfiguration));
+           
+            var rabbitMqConfiguration = _configuration.GetSection("RabbitMqConfiguration");
+            
+            if (rabbitMqConfiguration.Exists())
+                services.Configure<RabbitMqConfiguration>(rabbitMqConfiguration);
+            else
+                throw new System.Exception("RabbitMqConfiguration not found");
+
             var busMessageListType = TypeUtilities.GetAllAssembysTypeFromAssignableInterface(typeof(IBusMessage), true);
             var consumeHandlerListType = TypeUtilities.GetAllAssembysTypeFromAssignableInterface(typeof(IConsumeHandler), true);
             var rabbitMqContextList = GetRabbitMqContexts(busMessageListType, consumeHandlerListType, services.BuildServiceProvider());

@@ -16,6 +16,8 @@ namespace Core.Security.Extantions
         {
             var configuration =(IConfiguration)app.ApplicationServices.GetService(typeof(IConfiguration));
             var basic = configuration.GetSection("BasicAuthConfiguration");
+
+
             
             if(basic.Exists())
                app.UseMiddleware<BasicAuthenticationMiddleware>();

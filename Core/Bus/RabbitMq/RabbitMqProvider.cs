@@ -75,7 +75,7 @@ namespace Core.Bus.RabbitMq
                         var body = result.Body.ToArray();
                         var message = Encoding.UTF8.GetString(body);
                         var convertMessage = message.ToBusObject(RabbitMqContext?.BusMessage);
-                        await RabbitMqContext?.ConsumeHandler.HandleAsync(convertMessage);                       
+                        await RabbitMqContext?.ConsumeHandler?.HandleAsync(convertMessage);                       
                         //channel.BasicAck(result.DeliveryTag, false);                        
                     }
                 }

@@ -35,7 +35,7 @@ namespace Core.Infrastructure.Extantions
             var projectInfoConfiguration = _configuration.GetSection("ProjectInfoConfiguration");
             
             if (projectInfoConfiguration.Exists())
-                Console.WriteLine("implement edilmeli"); //services.Configure<ProjectInfoConfiguration>(projectInfoConfiguration);
+                 services.Configure<ProjectInfoConfiguration>(projectInfoConfiguration);
             else
                 throw new System.Exception("ProjectInfoConfiguration not found");
 

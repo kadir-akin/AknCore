@@ -22,17 +22,17 @@ namespace Core.LogAkn.Extantions
         {
 
             services.AddHttpContextAccessor();
-            var servisProvider = services.BuildServiceProvider();
-            var _configuration = servisProvider.GetService<IConfiguration>();
+            var _configuration = services.BuildServiceProvider().GetService<IConfiguration>();
 
             var logConfigurationsection = _configuration.GetSection("LogConfiguration");
-            var logInfo = servisProvider.GetService<IOptions<LogConfiguration>>();
-
+            
             if (logConfigurationsection.Exists())
-                Console.WriteLine("implement edilmeli"); //services.Configure<LogConfiguration>(logConfigurationsection);
+                services.Configure<LogConfiguration>(logConfigurationsection);
             else
                 throw new System.Exception("LogConfiguration not found");
-
+           
+            var logInfo = services.BuildServiceProvider().GetService<IOptions<LogConfiguration>>();
+            
             if (logInfo.Value.EnableLog)
             {
                 if (logInfo.Value.EnableElasticLogProvider)

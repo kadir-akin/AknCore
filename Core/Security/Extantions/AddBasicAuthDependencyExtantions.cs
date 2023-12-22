@@ -38,7 +38,7 @@ namespace Core.Security.Extantions
             var basicAuthConfiguration = _configuration.GetSection("BasicAuthConfiguration");
             
             if (basicAuthConfiguration.Exists())
-                Console.WriteLine("BasicAuthConfiguration implement Edilmeli"); //services.Configure<BasicAuthConfiguration>(basicAuthConfiguration);
+                services.Configure<BasicAuthConfiguration>(basicAuthConfiguration);
             else
                 throw new System.Exception("BasicAuthConfiguration not found");
 
