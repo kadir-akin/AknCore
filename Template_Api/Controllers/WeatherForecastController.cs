@@ -61,7 +61,7 @@ namespace Template_Api.Controllers
                 { 
                  Deneme="Deneme versii Girildi"
                 };
-            });
+            },TimeSpan.FromSeconds(30));
 
            // var result=  _cacheManager.Get<BusMessageTest>(stringKey);
           

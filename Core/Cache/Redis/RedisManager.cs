@@ -56,7 +56,6 @@ namespace Core.Cache.Redis
         { 
             return _redisServer.Database.KeyExistsAsync(key);
         }
-
         public async Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T: class
         {
             if (await ExistAsync(key))
@@ -67,6 +66,7 @@ namespace Core.Cache.Redis
             {
                 var result =await  func();
                 await _redisServer.Database.HashSetAsync(key,RedisUtilities.ToHashEntries(result));
+                await _redisServer.Database.KeyExpireAsync(key, timeSpan);
                 return result;
             }
 
