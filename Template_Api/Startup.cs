@@ -1,5 +1,6 @@
 using Core.Bus.Extantions;
 using Core.Bus.RabbitMq;
+using Core.Cache.Extantions;
 using Core.Elastic.Abstract;
 using Core.Elastic.Concrate;
 using Core.Elastic.Extantions;
@@ -53,9 +54,10 @@ namespace Template_Api
             services.AddControllers();                    
             services.AddLocalizationService();                                
             services.AddAknLogDependency();
-            services.AddRabbitBus()
-                .RabbitMqSubcribeAndPublish<BusMessageTest>()
-                .RabbitMqPublish<DenemeMessageTest>();
+            //services.AddRabbitBus()
+            //  .RabbitMqSubcribeAndPublish<BusMessageTest>()
+            //.RabbitMqPublish<DenemeMessageTest>();
+            services.AddRedis();
 
 
 

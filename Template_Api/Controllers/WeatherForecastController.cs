@@ -1,4 +1,5 @@
 ﻿using Core.Bus.Abstract;
+using Core.Cache.Abstract;
 using Core.Elastic.Abstract;
 using Core.LogAkn.Abstract;
 using Core.LogAkn.Extantions;
@@ -26,12 +27,14 @@ namespace Template_Api.Controllers
         };      
         private readonly ILogService _logService;
         private readonly IAknUser _aknUser;
-        private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser, IRabbitMqProvider<BusMessageTest> rabbitMqProvider)
+        // private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
+        private readonly ICacheManager _cacheManager;
+        public WeatherForecastController( ILogService logService, IAknUser aknUser, ICacheManager cacheManager)
         {     
             _logService = logService;
            _aknUser = aknUser;
-            _rabbitMqProvider = rabbitMqProvider;
+            _cacheManager = cacheManager;
+      
         }
 
 
@@ -45,7 +48,11 @@ namespace Template_Api.Controllers
         [AknAuthorizationFilter("TESTROLE")]
         public async Task<object> abc([FromBody] TestInputObject test)
         {
-            _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " +Guid.NewGuid().ToString() });
+            var stringKey = "BusMessage:Deneme:" + Guid.NewGuid().ToString();
+            _cacheManager.Add(stringKey, new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });
+
+            var result=  _cacheManager.Get<BusMessageTest>(stringKey);
+           // _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " +Guid.NewGuid().ToString() });
             //var userhttpContext = HttpContext.User;
             //var threadUser = AknUserUtilities.GetCurrentUser();
             //await _elasticSearchProvider.ChekIndex();
@@ -68,7 +75,7 @@ namespace Template_Api.Controllers
             //}
 
             //_logService.LogInformationAsync("{0} logu eklendi user Id :{1}","Kadir akın", userID);
-            return Summaries;
+            return result;
         }
 
         [HttpPost]
