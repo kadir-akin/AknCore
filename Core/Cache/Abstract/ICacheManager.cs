@@ -23,6 +23,11 @@ namespace Core.Cache.Abstract
 
 
         public Task ClearAsync();
-       
+
+        public Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class;
+
+        public  Task<T> GetAsync<T>(string key) where T : class;
+
+
     }
 }

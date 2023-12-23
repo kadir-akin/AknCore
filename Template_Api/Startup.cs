@@ -54,7 +54,7 @@ namespace Template_Api
             services.AddControllers();                    
             services.AddLocalizationService();                                
             services.AddAknLogDependency();
-            //services.AddRabbitBus()
+            services.AddRabbitBus().RabbitMqPublish<BusMessageTest>();
             //  .RabbitMqSubcribeAndPublish<BusMessageTest>()
             //.RabbitMqPublish<DenemeMessageTest>();
             services.AddRedis();

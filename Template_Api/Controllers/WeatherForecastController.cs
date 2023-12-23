@@ -27,13 +27,14 @@ namespace Template_Api.Controllers
         };      
         private readonly ILogService _logService;
         private readonly IAknUser _aknUser;
-        // private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
+        private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
         private readonly ICacheManager _cacheManager;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser, ICacheManager cacheManager)
+        public WeatherForecastController( ILogService logService, IAknUser aknUser, ICacheManager cacheManager, IRabbitMqProvider<BusMessageTest> rabbitMqProvider)
         {     
             _logService = logService;
            _aknUser = aknUser;
             _cacheManager = cacheManager;
+            _rabbitMqProvider = rabbitMqProvider;
       
         }
 
@@ -49,10 +50,21 @@ namespace Template_Api.Controllers
         public async Task<object> abc([FromBody] TestInputObject test)
         {
             var stringKey = "BusMessage:Deneme:" + Guid.NewGuid().ToString();
-            _cacheManager.Add(stringKey, new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });
 
-            var result=  _cacheManager.Get<BusMessageTest>(stringKey);
-           // _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " +Guid.NewGuid().ToString() });
+          
+
+            var result= await _cacheManager.GetOrAddAsync<BusMessageTest>(stringKey,async ()=>
+            {
+               await _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });
+                var logresult= await _rabbitMqProvider.MessageCount();
+                return new BusMessageTest() 
+                { 
+                 Deneme="Deneme versii Girildi"
+                };
+            });
+
+           // var result=  _cacheManager.Get<BusMessageTest>(stringKey);
+          
             //var userhttpContext = HttpContext.User;
             //var threadUser = AknUserUtilities.GetCurrentUser();
             //await _elasticSearchProvider.ChekIndex();

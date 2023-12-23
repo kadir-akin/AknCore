@@ -1,8 +1,10 @@
 ﻿using Core.Cache.Abstract;
 using Core.Utilities;
 using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,5 +51,34 @@ namespace Core.Cache.Redis
         {
            return _redisServer.FlushDatabaseAsync();
         }
+
+        public Task<bool> ExistAsync(string key) 
+        { 
+            return _redisServer.Database.KeyExistsAsync(key);
+        }
+
+        public async Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T: class
+        {
+            if (await ExistAsync(key))
+            {
+               return await GetAsync<T>(key);
+            }
+            else
+            {
+                var result =await  func();
+                await _redisServer.Database.HashSetAsync(key,RedisUtilities.ToHashEntries(result));
+                return result;
+            }
+
+        }
+
+
+        public async Task<T> GetAsync<T>(string key) where T : class
+        {
+            var hashEntryList = await _redisServer.Database.HashGetAllAsync(key);
+            return RedisUtilities.HashEntryToObject<T>(hashEntryList);
+        }
+
+        
     }
 }

@@ -53,7 +53,7 @@ namespace Core.Bus.RabbitMq
             }
 
 
-            return null;
+            return Task.CompletedTask;
         }
 
         public async Task Consume()
