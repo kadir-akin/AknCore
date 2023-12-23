@@ -11,32 +11,21 @@ namespace Core.Utilities
 {
     public static class RedisUtilities
     {
-        public static HashEntry[] ToHashEntries(object obj)
+        public static HashEntry[] ToHashEntries(string key,object obj,TimeSpan? expiry)
         {
-            PropertyInfo[] properties = obj.GetType().GetProperties();
-            return properties
-                .Where(x => x.GetValue(obj) != null)
-                .Select
-                (
-                      property =>
-                      {
-                          object propertyValue = property.GetValue(obj);
-                          string hashValue;
+            var entryList = new  List<HashEntry>();
+            entryList.Add( new HashEntry("Value", JsonConvert.SerializeObject(obj)));
+            entryList.Add(new HashEntry("Key", key));                       
+            
+            var nowDateTime = DateTime.Now;           
+            entryList.Add(new HashEntry("CreateDate", nowDateTime.ToString("G")));
 
-
-                          if (propertyValue is IEnumerable<object>)
-                          {
-                              hashValue = JsonConvert.SerializeObject(propertyValue);
-                          }
-                          else
-                          {
-                              hashValue = propertyValue.ToString();
-                          }
-
-                          return new HashEntry(property.Name, hashValue);
-                      }
-                )
-                .ToArray();
+            var expireDate = nowDateTime.Add(expiry ?? TimeSpan.MaxValue);
+            entryList.Add(new HashEntry("ExpirationDate", expireDate.ToString("G")));
+            entryList.Add(new HashEntry("ExpirationTotalMinutes", (expiry ?? TimeSpan.MaxValue).TotalMinutes));
+           
+            return entryList.ToArray();
+           
         }
 
         public static T HashEntryToObject<T>(HashEntry[] hashEntries)
@@ -51,5 +40,20 @@ namespace Core.Utilities
             }
             return (T)obj;
         }
+
+        public static T ToObjectCacheEntryHashEntrys<T>(HashEntry[] hashEntries) 
+        {
+           var cacheEntry=  HashEntryToObject<CacheEntry>(hashEntries);
+           var value = cacheEntry?.Value;
+
+            if (!string.IsNullOrEmpty(value))
+                return value.ToObject<T>();
+
+            return default(T);
+
+
+        }
+
+      
     }
 }

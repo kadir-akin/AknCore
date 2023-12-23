@@ -10,7 +10,7 @@ namespace Core.Cache.Abstract
         public void Add(string key, object data);
 
 
-        public bool Any(string key);
+        public bool Exist(string key);
 
 
 
@@ -21,10 +21,10 @@ namespace Core.Cache.Abstract
         public void Remove(string key);
 
 
-
+        public Task RemoveAsync(string key);
         public Task ClearAsync();
 
-        public Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class;
+        public Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan =null ) where T : class;
 
         public  Task<T> GetAsync<T>(string key) where T : class;
 

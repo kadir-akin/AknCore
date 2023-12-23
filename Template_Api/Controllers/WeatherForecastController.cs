@@ -61,8 +61,10 @@ namespace Template_Api.Controllers
                 { 
                  Deneme="Deneme versii Girildi"
                 };
-            },TimeSpan.FromSeconds(30));
+            },TimeSpan.FromDays(30));
 
+
+            return await _cacheManager.GetAsync<BusMessageTest>(stringKey);
            // var result=  _cacheManager.Get<BusMessageTest>(stringKey);
           
             //var userhttpContext = HttpContext.User;

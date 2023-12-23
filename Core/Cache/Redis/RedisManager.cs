@@ -26,14 +26,14 @@ namespace Core.Cache.Redis
             _redisServer.Database.StringSet(key, jsonData);
         }
 
-        public bool Any(string key)
+        public bool Exist(string key)
         {
             return _redisServer.Database.KeyExists(key);
         }
 
         public T Get<T>(string key)
         {
-            if (Any(key))
+            if (Exist(key))
             {
                 string jsonData = _redisServer.Database.StringGet(key);
                 return jsonData.ToObject<T>();
@@ -56,7 +56,7 @@ namespace Core.Cache.Redis
         { 
             return _redisServer.Database.KeyExistsAsync(key);
         }
-        public async Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T: class
+        public async Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan) where T: class
         {
             if (await ExistAsync(key))
             {
@@ -65,18 +65,21 @@ namespace Core.Cache.Redis
             else
             {
                 var result =await  func();
-                await _redisServer.Database.HashSetAsync(key,RedisUtilities.ToHashEntries(result));
+                await _redisServer.Database.HashSetAsync(key,RedisUtilities.ToHashEntries(key,result, timeSpan));
                 await _redisServer.Database.KeyExpireAsync(key, timeSpan);
                 return result;
             }
 
         }
-
+        public Task RemoveAsync(string key) 
+        {
+          return _redisServer.Database.KeyDeleteAsync(key);
+        }
 
         public async Task<T> GetAsync<T>(string key) where T : class
         {
             var hashEntryList = await _redisServer.Database.HashGetAllAsync(key);
-            return RedisUtilities.HashEntryToObject<T>(hashEntryList);
+            return RedisUtilities.ToObjectCacheEntryHashEntrys<T>(hashEntryList);
         }
 
         
