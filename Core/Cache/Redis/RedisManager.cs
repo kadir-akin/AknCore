@@ -1,4 +1,5 @@
 ﻿using Core.Cache.Abstract;
+using Core.Cache.Concrate;
 using Core.Utilities;
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -65,8 +66,11 @@ namespace Core.Cache.Redis
             else
             {
                 var result =await  func();
-                await _redisServer.Database.HashSetAsync(key,RedisUtilities.ToHashEntries(key,result, timeSpan));
+                var hashEntrys = RedisUtilities.ToHashEntries(key, result, timeSpan);
+                var cacheEntry=RedisUtilities.HashEntryToObject<CacheEntry>(hashEntrys);
+                await _redisServer.Database.HashSetAsync(key, hashEntrys);
                 await _redisServer.Database.KeyExpireAsync(key, timeSpan);
+                await _redisServer.Publish<CacheEntry>(cacheEntry);
                 return result;
             }
 

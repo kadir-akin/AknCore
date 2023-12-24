@@ -55,11 +55,11 @@ namespace Template_Api.Controllers
 
             var result= await _cacheManager.GetOrAddAsync<BusMessageTest>(stringKey,async ()=>
             {
-               await _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });
-                var logresult= await _rabbitMqProvider.MessageCount();
+              // await _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });
+               // var logresult= await _rabbitMqProvider.MessageCount();
                 return new BusMessageTest() 
                 { 
-                 Deneme="Deneme versii Girildi"
+                 Deneme="Deneme versii Girildi" + Guid.NewGuid().ToString()
                 };
             },TimeSpan.FromDays(30));
 

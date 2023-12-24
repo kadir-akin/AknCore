@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -19,11 +20,17 @@ namespace Core.Cache.Redis
             ConnectionString = _redisConfiguration.Value.Host;
             ConnectionMultiplexer = CreateConnection();
             Database = ConnectionMultiplexer.GetDatabase(CurrentDatabaseId);
+            Subscriber=ConnectionMultiplexer.GetSubscriber();
+            Channel = "ChannelDeneme";
         }
         public ConnectionMultiplexer ConnectionMultiplexer { get; set; }
         public IDatabase Database { get; set; }
+        public ISubscriber Subscriber { get; set; }
         public int CurrentDatabaseId { get; set; }
         public string ConnectionString { get; set; }
+        public string Channel { get; set; }
+
+
         public async Task FlushDatabaseAsync()
         {
             foreach (var item in ConnectionMultiplexer.GetServers())
@@ -33,6 +40,28 @@ namespace Core.Cache.Redis
                        
         }
 
+        public Task<long> Publish<T>(T value) where T:class 
+        {
+           return Subscriber.PublishAsync(Channel, JsonConvert.SerializeObject(value),CommandFlags.FireAndForget);
+
+        }
+
+        public async Task<T> Subscribe<T>() where T : class
+        {
+             string _message = String.Empty;
+             await  Subscriber.SubscribeAsync(Channel, (channel, message) => { 
+                _message = message;
+             
+             }, CommandFlags.FireAndForget);
+
+            if (!string.IsNullOrEmpty( _message))
+            {
+                return JsonConvert.DeserializeObject<T>(_message);
+            }
+
+            return default(T);
+
+        }
         private ConnectionMultiplexer CreateConnection()
         {            
             string password = _redisConfiguration.Value.Password;
