@@ -21,7 +21,7 @@ namespace Core.Cache.Memory
         {
             var cacheExpOptions = new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddMinutes((timeSpan?.TotalMinutes ?? 0))
+                AbsoluteExpiration = new DateTimeOffset(DateTime.Now, timeSpan ?? TimeSpan.MaxValue)
             };
             _memoryCache.Set(key, new CacheEntry(key, data, timeSpan), cacheExpOptions);
         }
@@ -30,7 +30,7 @@ namespace Core.Cache.Memory
         {
             var cacheExpOptions = new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddMinutes((timeSpan?.TotalMinutes ?? 0))              
+                 AbsoluteExpiration = new DateTimeOffset(DateTime.Now,timeSpan ?? TimeSpan.MaxValue)
             };
              var data = await func();
             _memoryCache.Set(key, new CacheEntry(key,data,timeSpan),cacheExpOptions);
