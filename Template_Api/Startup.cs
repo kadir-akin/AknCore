@@ -57,7 +57,7 @@ namespace Template_Api
             services.AddRabbitBus().RabbitMqPublish<BusMessageTest>();
             //  .RabbitMqSubcribeAndPublish<BusMessageTest>()
             //.RabbitMqPublish<DenemeMessageTest>();
-            services.AddRedis();
+            services.AddAknCache();
 
 
 

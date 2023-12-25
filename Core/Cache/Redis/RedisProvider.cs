@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Core.Cache.Redis
 {
-    public class RedisManager :ICacheManager
+    public class RedisProvider : IRedisProvider
     {
         private RedisServer _redisServer;
 
-        public RedisManager(RedisServer redisServer)
+        public RedisProvider(RedisServer redisServer)
         {
             _redisServer = redisServer;
 
@@ -52,39 +52,48 @@ namespace Core.Cache.Redis
         {
            return _redisServer.FlushDatabaseAsync();
         }
+        public async Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan) where T : class
+        {
+            if (await ExistAsync(key))
+            {
+                return await GetAsync<T>(key);
+            }
+            else
+            {
+                var result = await func();
+                var hashEntrys = RedisUtilities.ToHashEntries(key, result, timeSpan);                
+                await _redisServer.Database.HashSetAsync(key, hashEntrys);
+                await _redisServer.Database.KeyExpireAsync(key, timeSpan);
+                //var cacheEntry = RedisUtilities.HashEntryToObject<CacheEntry>(hashEntrys);
+                //await _redisServer.Publish<CacheEntry>(cacheEntry);
+                return result;
+            }
 
+        }
+
+        public async Task<T> AddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan) where T : class
+        {
+            var result = await func();
+            var hashEntrys = RedisUtilities.ToHashEntries(key, result, timeSpan);           
+            await _redisServer.Database.HashSetAsync(key, hashEntrys);
+            await _redisServer.Database.KeyExpireAsync(key, timeSpan);
+            return result;
+        } 
         public Task<bool> ExistAsync(string key) 
         { 
             return _redisServer.Database.KeyExistsAsync(key);
         }
-        public async Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan) where T: class
+        public async Task<T> GetAsync<T>(string key) where T : class
         {
-            if (await ExistAsync(key))
-            {
-               return await GetAsync<T>(key);
-            }
-            else
-            {
-                var result =await  func();
-                var hashEntrys = RedisUtilities.ToHashEntries(key, result, timeSpan);
-                var cacheEntry=RedisUtilities.HashEntryToObject<CacheEntry>(hashEntrys);
-                await _redisServer.Database.HashSetAsync(key, hashEntrys);
-                await _redisServer.Database.KeyExpireAsync(key, timeSpan);
-                await _redisServer.Publish<CacheEntry>(cacheEntry);
-                return result;
-            }
-
+            var hashEntryList = await _redisServer.Database.HashGetAllAsync(key);
+            return RedisUtilities.ToObjectCacheEntryHashEntrys<T>(hashEntryList);
         }
         public Task RemoveAsync(string key) 
         {
           return _redisServer.Database.KeyDeleteAsync(key);
         }
 
-        public async Task<T> GetAsync<T>(string key) where T : class
-        {
-            var hashEntryList = await _redisServer.Database.HashGetAllAsync(key);
-            return RedisUtilities.ToObjectCacheEntryHashEntrys<T>(hashEntryList);
-        }
+       
 
         
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Core.RequestContext.Concrate;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
@@ -13,15 +14,17 @@ namespace Core.Cache.Redis
     public class RedisServer
     {
         private readonly IOptions<RedisConfiguration> _redisConfiguration;
-        public RedisServer(IOptions<RedisConfiguration> redisConfiguration)
+        private readonly IOptions<ProjectInfoConfiguration> _projectInfoConfiguration;
+        public RedisServer(IOptions<RedisConfiguration> redisConfiguration, IOptions<ProjectInfoConfiguration> projectInfoConfiguration)
         {
             _redisConfiguration = redisConfiguration;
+            _projectInfoConfiguration = projectInfoConfiguration;
             CurrentDatabaseId = _redisConfiguration.Value.Database;
             ConnectionString = _redisConfiguration.Value.Host;
             ConnectionMultiplexer = CreateConnection();
             Database = ConnectionMultiplexer.GetDatabase(CurrentDatabaseId);
             Subscriber=ConnectionMultiplexer.GetSubscriber();
-            Channel = "ChannelDeneme";
+            Channel = $"{_projectInfoConfiguration.Value.ProjectName}_{_projectInfoConfiguration.Value.ApplicationName}_Akn_Redis_Channel";
         }
         public ConnectionMultiplexer ConnectionMultiplexer { get; set; }
         public IDatabase Database { get; set; }

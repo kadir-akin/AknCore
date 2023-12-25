@@ -13,5 +13,8 @@ namespace Core.Cache.Redis
         public string Password { get; set; }
 
         public int Database { get; set; }
+
+        public bool MemoryFirst { get; set; }
+
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Core.Cache.Abstract
 {
-    public interface ICacheManager
+    public interface IRedisProvider :ICacheProvider
     {
         public void Add(string key, object data);
         public bool Exist(string key);
