@@ -95,5 +95,9 @@ namespace Core.Cache.Redis
           return _redisServer.Database.KeyDeleteAsync(key);
         }
 
+        public Task<long> Publish<T>(string key, T value, TimeSpan? timeSpan) where T : class
+        {
+          return _redisServer.Publish<T>(key, value, timeSpan);   
+        }
     }
 }

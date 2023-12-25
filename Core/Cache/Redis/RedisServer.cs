@@ -57,9 +57,10 @@ namespace Core.Cache.Redis
                        
         }
 
-        public Task<long> Publish<T>(T value) where T:class 
+        public Task<long> Publish<T>(string key,T value,TimeSpan? timeSpan) where T:class 
         {
-           return Subscriber.PublishAsync(Channel, JsonConvert.SerializeObject(value),CommandFlags.FireAndForget);
+            var cacheEntry = new CacheEntry(key, value, timeSpan);
+            return Subscriber.PublishAsync(Channel, JsonConvert.SerializeObject(cacheEntry),CommandFlags.FireAndForget);
 
         }
 

@@ -16,5 +16,7 @@ namespace Core.Cache.Abstract
         public Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class;
         public Task<T> GetAsync<T>(string key) where T : class;
         public Task<T> AddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan) where T : class;
+
+        public Task<T> GetOrAddMemoryFirstAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class;
     }
 }

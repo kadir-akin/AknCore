@@ -27,7 +27,7 @@ namespace Core.Cache.Concrate
             Value = data.ToJsonString();
 
             var dateTime =DateTime.Now;
-            var expireDate = dateTime.Add(timeSpan ?? TimeSpan.MaxValue);
+            var expireDate = dateTime.Add(timeSpan ?? TimeSpan.FromDays(1));
             CreateDate = dateTime.ToString("G");
             ExpirationDate = expireDate.ToString("G");
             ExpirationTotalMinutes = (timeSpan ?? TimeSpan.FromDays(1)).TotalMinutes;
