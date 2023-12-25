@@ -17,9 +17,9 @@ namespace Core.Cache.Concrate
             _redisProvider =(IRedisProvider)_cacheFactory.GetProvider(CacheTypeEnum.Redis);
             _memoryCacheProvider = (IMemoryCacheProvider)_cacheFactory.GetProvider(CacheTypeEnum.Memory);
         }
-        public void Add(string key, object data)
+        public void Add(string key, object data,TimeSpan? timeSpan)
         {
-            _redisProvider.Add(key, data);
+            _redisProvider.Add(key, data, timeSpan);
         }
 
         public Task<T> AddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan) where T : class

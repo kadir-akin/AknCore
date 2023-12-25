@@ -54,6 +54,18 @@ namespace Core.Utilities
 
         }
 
+        public static T  GetData<T>(this CacheEntry cacheEntry) 
+        {
+            if (cacheEntry == null) return default(T);
+
+            var value = cacheEntry?.Value;
+
+            if (!string.IsNullOrEmpty(value))
+                return value.ToObject<T>();
+
+            return default(T);
+        }
+
       
     }
 }

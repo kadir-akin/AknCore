@@ -7,7 +7,7 @@ namespace Core.Cache.Abstract
 {
     public interface IMemoryCacheProvider :ICacheProvider
     {
-        public void Add(string key, object data);
+        public void Add(string key, object data, TimeSpan? timeSpan);
         public bool Exist(string key);
         public T Get<T>(string key);
         public void Remove(string key);

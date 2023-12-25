@@ -1,5 +1,6 @@
 ﻿using Core.Cache.Abstract;
 using Core.Cache.Concrate;
+using Core.Utilities;
 using Microsoft.Extensions.Caching.Memory;
 using System;
 using System.Collections.Generic;
@@ -16,19 +17,23 @@ namespace Core.Cache.Memory
             _memoryCache= memoryCache;
         }
 
-        public void Add(string key, object data)
+        public void Add(string key, object data,TimeSpan? timeSpan)
         {
-            _memoryCache.Set(key, data);
+            var cacheExpOptions = new MemoryCacheEntryOptions
+            {
+                AbsoluteExpiration = DateTime.Now.AddMinutes((timeSpan?.TotalMinutes ?? 0))
+            };
+            _memoryCache.Set(key, new CacheEntry(key, data, timeSpan), cacheExpOptions);
         }
 
         public async Task<T> AddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan) where T : class
         {
             var cacheExpOptions = new MemoryCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddMinutes((timeSpan?.TotalMinutes ?? 0)              
+                AbsoluteExpiration = DateTime.Now.AddMinutes((timeSpan?.TotalMinutes ?? 0))              
             };
              var data = await func();
-            _memoryCache.Set(key, data,cacheExpOptions);
+            _memoryCache.Set(key, new CacheEntry(key,data,timeSpan),cacheExpOptions);
             return data;
         }
 
@@ -49,34 +54,45 @@ namespace Core.Cache.Memory
 
         public T Get<T>(string key)
         {
-          var result= _memoryCache.Get(key);
+            var result= _memoryCache.Get<CacheEntry>(key);
 
             if (result ==null)
             {
                 return default(T);
             }
-
-            return (T)result;
+            return result.GetData<T>();
         }
 
         public Task<T> GetAsync<T>(string key) where T : class
         {
-            throw new NotImplementedException();
+            var result = _memoryCache.Get<CacheEntry>(key);
+
+            if (result == null)
+            {
+                return Task.FromResult(default(T));
+            }
+            return Task.FromResult(result.GetData<T>());
         }
 
         public Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class
         {
+            //_memoryCache.GetOrCreateAsync<CacheEntry>(key, (x, y) =>
+            //{
+
+            //    return default(CacheEntry);
+            //});
             throw new NotImplementedException();
         }
 
         public void Remove(string key)
         {
-            throw new NotImplementedException();
+           _memoryCache.Remove(key);
         }
 
         public Task RemoveAsync(string key)
         {
-            throw new NotImplementedException();
+            _memoryCache.Remove(key);
+            return Task.CompletedTask;
         }
     }
 }

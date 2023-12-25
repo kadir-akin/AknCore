@@ -16,7 +16,14 @@ namespace Core.Utilities
             var result =JsonConvert.SerializeObject(message);
             return result;
         }
+        public static string ToJsonString(this object message)
+        {
+            if (message == null)
+                return null;
 
+            var result = JsonConvert.SerializeObject(message);
+            return result;
+        }
         public static TObject ToObject<TObject>(this string message) 
         {
 
