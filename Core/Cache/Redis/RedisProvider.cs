@@ -95,8 +95,5 @@ namespace Core.Cache.Redis
           return _redisServer.Database.KeyDeleteAsync(key);
         }
 
-       
-
-        
     }
 }

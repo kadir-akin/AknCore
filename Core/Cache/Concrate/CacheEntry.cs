@@ -30,7 +30,7 @@ namespace Core.Cache.Concrate
             var expireDate = dateTime.Add(timeSpan ?? TimeSpan.MaxValue);
             CreateDate = dateTime.ToString("G");
             ExpirationDate = expireDate.ToString("G");
-            ExpirationTotalMinutes = (timeSpan ?? TimeSpan.MaxValue).TotalMinutes;
+            ExpirationTotalMinutes = (timeSpan ?? TimeSpan.FromDays(1)).TotalMinutes;
 
         }
 

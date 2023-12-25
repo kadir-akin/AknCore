@@ -1,4 +1,5 @@
 ﻿using Core.Cache.Abstract;
+using Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -50,8 +51,7 @@ namespace Core.Cache.Concrate
         public Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class
         {
             return _redisProvider.GetOrAddAsync<T>(key, func, timeSpan);    
-        }
-
+        }       
         public void Remove(string key)
         {
            _redisProvider.Remove(key);

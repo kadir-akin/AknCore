@@ -20,9 +20,9 @@ namespace Core.Utilities
             var nowDateTime = DateTime.Now;           
             entryList.Add(new HashEntry("CreateDate", nowDateTime.ToString("G")));
 
-            var expireDate = nowDateTime.Add(expiry ?? TimeSpan.MaxValue);
+            var expireDate = nowDateTime.Add(expiry ?? TimeSpan.FromDays(1));
             entryList.Add(new HashEntry("ExpirationDate", expireDate.ToString("G")));
-            entryList.Add(new HashEntry("ExpirationTotalMinutes", (expiry ?? TimeSpan.MaxValue).TotalMinutes));
+            entryList.Add(new HashEntry("ExpirationTotalMinutes", (expiry ?? TimeSpan.FromDays(1)).TotalMinutes));
            
             return entryList.ToArray();
            

@@ -24,24 +24,27 @@ namespace Core.Cache.Extantions
 
 
             services.Configure<RedisConfiguration>(redisSection);
-            services.AddSingleton<RedisServer>();
-            services.AddSingleton<IRedisProvider, RedisProvider>();
-            services.AddSingleton(typeof(ICacheFactory),new CacheFactory());
-
-            var cacheFactory =(ICacheFactory) services.BuildServiceProvider().GetService(typeof(ICacheFactory));
-            var redisProvider = (IRedisProvider)services.BuildServiceProvider().GetService(typeof(IRedisProvider));
-            var redisConfiguration =services.BuildServiceProvider().GetService<IOptions<RedisConfiguration>>();
-            cacheFactory.AddProvider(redisProvider);
+            services.AddSingleton(typeof(ICacheFactory), new CacheFactory());
+            var redisConfiguration = services.BuildServiceProvider().GetService<IOptions<RedisConfiguration>>();
+            var cacheFactory = services.BuildServiceProvider().GetService<ICacheFactory>();
 
             if (redisConfiguration.Value.MemoryFirst)
             {
                 services.AddMemoryCache();
                 services.AddSingleton<IMemoryCacheProvider, MemoryCacheProvider>();
                 var memoryProvider = services.BuildServiceProvider().GetService<IMemoryCacheProvider>();
-                cacheFactory.AddProvider(memoryProvider);
+                cacheFactory.AddProvider(memoryProvider);           
             }
+        
+            services.AddSingleton<RedisServer>();
+            services.AddSingleton<IRedisProvider, RedisProvider>();
+                                              
+            var redisProvider = services.BuildServiceProvider().GetService<IRedisProvider>();           
+            cacheFactory.AddProvider(redisProvider);
 
+           
             services.AddSingleton<ICacheManager, CacheManager>();
+          
             return services;
         }
     }

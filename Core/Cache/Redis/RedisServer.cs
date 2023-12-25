@@ -1,4 +1,6 @@
-﻿using Core.RequestContext.Concrate;
+﻿using Core.Cache.Abstract;
+using Core.Cache.Concrate;
+using Core.RequestContext.Concrate;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using StackExchange.Redis;
@@ -8,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Utilities;
 
 namespace Core.Cache.Redis
 {
@@ -15,16 +18,27 @@ namespace Core.Cache.Redis
     {
         private readonly IOptions<RedisConfiguration> _redisConfiguration;
         private readonly IOptions<ProjectInfoConfiguration> _projectInfoConfiguration;
-        public RedisServer(IOptions<RedisConfiguration> redisConfiguration, IOptions<ProjectInfoConfiguration> projectInfoConfiguration)
+        private readonly ICacheFactory _cacheFactory;
+        private readonly IMemoryCacheProvider _memoryCacheProvider;
+        public RedisServer(IOptions<RedisConfiguration> redisConfiguration, IOptions<ProjectInfoConfiguration> projectInfoConfiguration, ICacheFactory cacheFactory)
         {
             _redisConfiguration = redisConfiguration;
             _projectInfoConfiguration = projectInfoConfiguration;
+            _cacheFactory = cacheFactory;
             CurrentDatabaseId = _redisConfiguration.Value.Database;
             ConnectionString = _redisConfiguration.Value.Host;
             ConnectionMultiplexer = CreateConnection();
             Database = ConnectionMultiplexer.GetDatabase(CurrentDatabaseId);
             Subscriber=ConnectionMultiplexer.GetSubscriber();
-            Channel = $"{_projectInfoConfiguration.Value.ProjectName}_{_projectInfoConfiguration.Value.ApplicationName}_Akn_Redis_Channel";
+            //Channel = $"{_projectInfoConfiguration.Value.ProjectName}_{_projectInfoConfiguration.Value.ApplicationName}_Akn_Redis_Channel";
+            Channel = "ChannelDeneme";
+
+
+            if (_redisConfiguration.Value.MemoryFirst)
+            {
+                _memoryCacheProvider = (IMemoryCacheProvider)_cacheFactory.GetProvider(Concrate.CacheTypeEnum.Memory);
+                Subscribe();
+            }
         }
         public ConnectionMultiplexer ConnectionMultiplexer { get; set; }
         public IDatabase Database { get; set; }
@@ -49,20 +63,22 @@ namespace Core.Cache.Redis
 
         }
 
-        public async Task<T> Subscribe<T>() where T : class
+        public async Task Subscribe() 
         {
              string _message = String.Empty;
              await  Subscriber.SubscribeAsync(Channel, (channel, message) => { 
                 _message = message;
-             
-             }, CommandFlags.FireAndForget);
+                 
+                 var cacheEntry = _message.ToObject<CacheEntry>();
+                 var date = DateTime.Now.AddMinutes(cacheEntry.ExpirationTotalMinutes);
+                 
+                 if (_memoryCacheProvider.Exist(cacheEntry.Key))
+                     _memoryCacheProvider.Remove(cacheEntry.Key);
+                 
+                 _memoryCacheProvider.Add(cacheEntry.Key, JsonConvert.DeserializeObject(cacheEntry.Value), new TimeSpan(date.Day,date.Hour,date.Minute));
 
-            if (!string.IsNullOrEmpty( _message))
-            {
-                return JsonConvert.DeserializeObject<T>(_message);
-            }
-
-            return default(T);
+             });
+           
 
         }
         private ConnectionMultiplexer CreateConnection()
