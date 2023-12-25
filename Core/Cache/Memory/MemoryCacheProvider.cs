@@ -74,14 +74,17 @@ namespace Core.Cache.Memory
             return Task.FromResult(result.GetData<T>());
         }
 
-        public Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class
+        public async Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class
         {
-            //_memoryCache.GetOrCreateAsync<CacheEntry>(key, (x, y) =>
-            //{
 
-            //    return default(CacheEntry);
-            //});
-            throw new NotImplementedException();
+           var result=  await _memoryCache.GetOrCreateAsync<CacheEntry>(key, (async  y =>
+            {
+                var resultModel= await func();
+                y.AbsoluteExpiration = new DateTimeOffset(DateTime.Now, timeSpan ?? TimeSpan.MaxValue);
+                return new CacheEntry(key,resultModel,timeSpan);
+            }));
+
+            return result?.GetData<T>();          
         }
 
         public void Remove(string key)
