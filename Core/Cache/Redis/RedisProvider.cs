@@ -21,10 +21,11 @@ namespace Core.Cache.Redis
 
         }
 
-        public void Add(string key, object data)
-        {
-            string jsonData = JsonConvert.SerializeObject(data);
-            _redisServer.Database.StringSet(key, jsonData);
+        public void Add(string key, object data,TimeSpan? expire)
+        {         
+            var hashEntrys = RedisUtilities.ToHashEntries(key, data, expire);
+            _redisServer.Database.KeyExpire(key, expire);
+            _redisServer.Database.HashSet(key, hashEntrys);
         }
 
         public bool Exist(string key)
@@ -36,8 +37,9 @@ namespace Core.Cache.Redis
         {
             if (Exist(key))
             {
-                string jsonData = _redisServer.Database.StringGet(key);
-                return jsonData.ToObject<T>();
+                var hashEntryList = _redisServer.Database.HashGetAll(key);
+               return RedisUtilities.ToObjectCacheEntryHashEntrys<T>(hashEntryList);
+               
             }
 
             return default;

@@ -35,6 +35,7 @@ namespace Core.Cache.Extantions
 
             if (redisConfiguration.Value.MemoryFirst)
             {
+                services.AddMemoryCache();
                 services.AddSingleton<IMemoryCacheProvider, MemoryCacheProvider>();
                 var memoryProvider = services.BuildServiceProvider().GetService<IMemoryCacheProvider>();
                 cacheFactory.AddProvider(memoryProvider);
