@@ -14,11 +14,11 @@ namespace Core.Cache.Concrate
         private readonly IMemoryCacheProvider _memoryCacheProvider;
         public CacheManager(ICacheFactory cacheFactory)
         {
-            _cacheFactory= cacheFactory;
-            _redisProvider =(IRedisProvider)_cacheFactory.GetProvider(CacheTypeEnum.Redis);
+            _cacheFactory = cacheFactory;
+            _redisProvider = (IRedisProvider)_cacheFactory.GetProvider(CacheTypeEnum.Redis);
             _memoryCacheProvider = (IMemoryCacheProvider)_cacheFactory.GetProvider(CacheTypeEnum.Memory);
         }
-        public void Add(string key, object data,TimeSpan? timeSpan)
+        public void Add(string key, object data, TimeSpan? timeSpan)
         {
             _redisProvider.Add(key, data, timeSpan);
         }
@@ -50,20 +50,23 @@ namespace Core.Cache.Concrate
 
         public Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class
         {
-            return _redisProvider.GetOrAddAsync<T>(key, func, timeSpan);    
+            return _redisProvider.GetOrAddAsync<T>(key, func, timeSpan);
         }
 
         public async Task<T> GetOrAddMemoryFirstAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class
         {
-            var memoryAny =_memoryCacheProvider.Exist(key);
+            var memoryAny = _memoryCacheProvider.Exist(key);
             T result;
-           
+
             if (memoryAny)
                 result = _memoryCacheProvider.Get<T>(key);
             else
             {
-                result= await _memoryCacheProvider.GetOrAddAsync<T>(key, func, timeSpan);
-               
+                result = await _memoryCacheProvider.AddAsync<T>(key, func, timeSpan);
+
+                if (await _redisProvider.ExistAsync(key))
+                    await _redisProvider.RemoveAsync(key);
+
                 _redisProvider.GetOrAddAsync<T>(key, func, timeSpan);
                 _redisProvider.Publish<T>(key, result, timeSpan);
             }
@@ -74,7 +77,7 @@ namespace Core.Cache.Concrate
 
         public void Remove(string key)
         {
-           _redisProvider.Remove(key);
+            _redisProvider.Remove(key);
         }
 
         public Task RemoveAsync(string key)
