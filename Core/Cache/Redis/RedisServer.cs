@@ -64,18 +64,17 @@ namespace Core.Cache.Redis
         }
 
         public async Task Subscribe() 
-        {
-             string _message = String.Empty;
-             await  Subscriber.SubscribeAsync(Channel, (channel, message) => { 
-                _message = message;
+        {            
+             await  Subscriber.SubscribeAsync(Channel, (channel, message) => {
                  
-                 var cacheEntry = _message.ToObject<CacheEntry>();
-                 var date = DateTime.Now.AddMinutes(cacheEntry.ExpirationTotalMinutes);
+                 string _message = String.Empty;
+                 _message = message;               
+                 var cacheEntry = _message.ToObject<CacheEntry>();              
                  
                  if (_memoryCacheProvider.Exist(cacheEntry.Key))
                      _memoryCacheProvider.Remove(cacheEntry.Key);
                  
-                 _memoryCacheProvider.Add(cacheEntry.Key, JsonConvert.DeserializeObject(cacheEntry.Value), new TimeSpan(date.Day,date.Hour,date.Minute));
+                 _memoryCacheProvider.Add(cacheEntry.Key, JsonConvert.DeserializeObject(cacheEntry.Value), TimeSpan.FromMinutes(cacheEntry.ExpirationTotalMinutes));
 
              });
            
