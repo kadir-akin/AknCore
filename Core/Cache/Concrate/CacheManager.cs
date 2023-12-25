@@ -48,6 +48,17 @@ namespace Core.Cache.Concrate
             return _redisProvider.GetAsync<T>(key);
         }
 
+        public Task<T> GetMemoryFirstAsync<T>(string key) where T : class
+        {
+            var memoryAny = _memoryCacheProvider.Exist(key);
+
+            if (memoryAny)
+                return _memoryCacheProvider.GetAsync<T>(key);
+
+
+            return GetAsync<T>(key);
+        }
+
         public Task<T> GetOrAddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan = null) where T : class
         {
             return _redisProvider.GetOrAddAsync<T>(key, func, timeSpan);

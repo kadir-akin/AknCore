@@ -49,22 +49,22 @@ namespace Template_Api.Controllers
         [AknAuthorizationFilter("TESTROLE")]
         public async Task<object> abc([FromBody] TestInputObject test)
         {
-            var stringKey = "BusMessage:Deneme:" + Guid.NewGuid().ToString();
+            var stringKey = "BusMessage:Deneme:3939";
 
           
 
-            var result= await _cacheManager.GetOrAddAsync<BusMessageTest>(stringKey,async ()=>
+            var result= await _cacheManager.GetOrAddMemoryFirstAsync<BusMessageTest>(stringKey,async ()=>
             {
               // await _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });
                // var logresult= await _rabbitMqProvider.MessageCount();
                 return new BusMessageTest() 
                 { 
-                 Deneme="Deneme versii Girildi" + Guid.NewGuid().ToString()
+                 Deneme="memoryFirsDenemesi"
                 };
             },TimeSpan.FromDays(30));
 
 
-            return await _cacheManager.GetAsync<BusMessageTest>(stringKey);
+            return await _cacheManager.GetMemoryFirstAsync<BusMessageTest>(stringKey);
            // var result=  _cacheManager.Get<BusMessageTest>(stringKey);
           
             //var userhttpContext = HttpContext.User;
@@ -89,7 +89,7 @@ namespace Template_Api.Controllers
             //}
 
             //_logService.LogInformationAsync("{0} logu eklendi user Id :{1}","Kadir akın", userID);
-            return result;
+            //return result;
         }
 
         [HttpPost]
