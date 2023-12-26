@@ -16,5 +16,8 @@ namespace Core.Cache.Redis
 
         public bool MemoryFirst { get; set; }
 
+
+        public string ClientName { get; set; }
+
     }
 }

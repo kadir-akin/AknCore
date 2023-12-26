@@ -7,6 +7,7 @@ namespace Core.Cache.Abstract
 {
     public interface ICacheFactory
     {
+        public string RedisClientName { get; set; }
         public List<ICacheProvider> Providers { get; set; }
         public void AddProvider(ICacheProvider cacheProvider);
 

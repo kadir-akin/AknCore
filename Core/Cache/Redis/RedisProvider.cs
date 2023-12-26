@@ -23,7 +23,7 @@ namespace Core.Cache.Redis
 
         public void Add(string key, object data,TimeSpan? expire)
         {         
-            var hashEntrys = RedisUtilities.ToHashEntries(key, data, expire);
+            var hashEntrys = RedisUtilities.ToHashEntries(_redisServer.ClientName,key, data, expire);
             _redisServer.Database.KeyExpire(key, expire);
             _redisServer.Database.HashSet(key, hashEntrys);
         }
@@ -63,7 +63,7 @@ namespace Core.Cache.Redis
             else
             {
                 var result = await func();
-                var hashEntrys = RedisUtilities.ToHashEntries(key, result, timeSpan);                
+                var hashEntrys = RedisUtilities.ToHashEntries(_redisServer.ClientName, key, result, timeSpan);                
                 await _redisServer.Database.HashSetAsync(key, hashEntrys);
                 await _redisServer.Database.KeyExpireAsync(key, timeSpan);
                 //var cacheEntry = RedisUtilities.HashEntryToObject<CacheEntry>(hashEntrys);
@@ -76,7 +76,7 @@ namespace Core.Cache.Redis
         public async Task<T> AddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan) where T : class
         {
             var result = await func();
-            var hashEntrys = RedisUtilities.ToHashEntries(key, result, timeSpan);           
+            var hashEntrys = RedisUtilities.ToHashEntries(_redisServer.ClientName, key, result, timeSpan);           
             await _redisServer.Database.HashSetAsync(key, hashEntrys);
             await _redisServer.Database.KeyExpireAsync(key, timeSpan);
             return result;

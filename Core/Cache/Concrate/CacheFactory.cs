@@ -16,6 +16,7 @@ namespace Core.Cache.Concrate
                 Providers = new List<ICacheProvider>();
         }
         public List<ICacheProvider> Providers { get; set; }
+        public string RedisClientName { get; set; }
         public void AddProvider(ICacheProvider cacheProvider) 
         {
             

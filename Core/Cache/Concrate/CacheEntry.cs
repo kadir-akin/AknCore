@@ -12,7 +12,7 @@ namespace Core.Cache.Concrate
         public string CreateDate { get; set; }
         public string ExpirationDate { get; set; }
         public double ExpirationTotalMinutes { get; set; }
-
+        public string ClientName { get; set; }
 
 
         public CacheEntry()
@@ -21,11 +21,11 @@ namespace Core.Cache.Concrate
         }
 
 
-        public CacheEntry(string key,object data,TimeSpan? timeSpan)
+        public CacheEntry(string clientName ,string key,object data,TimeSpan? timeSpan)
         {
             Key=key;
             Value = data.ToJsonString();
-
+            ClientName=clientName;
             var dateTime =DateTime.Now;
             var expireDate = dateTime.Add(timeSpan ?? TimeSpan.FromDays(1));
             CreateDate = dateTime.ToString("G");

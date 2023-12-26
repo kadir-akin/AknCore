@@ -11,12 +11,12 @@ namespace Core.Utilities
 {
     public static class RedisUtilities
     {
-        public static HashEntry[] ToHashEntries(string key,object obj,TimeSpan? expiry)
+        public static HashEntry[] ToHashEntries(string clientName,string key,object obj,TimeSpan? expiry)
         {
             var entryList = new  List<HashEntry>();
             entryList.Add( new HashEntry("Value", JsonConvert.SerializeObject(obj)));
-            entryList.Add(new HashEntry("Key", key));                       
-            
+            entryList.Add(new HashEntry("Key", key));
+            entryList.Add(new HashEntry("ClientName", clientName));
             var nowDateTime = DateTime.Now;           
             entryList.Add(new HashEntry("CreateDate", nowDateTime.ToString("G")));
 

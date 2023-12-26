@@ -1,7 +1,9 @@
 ﻿using Core.Cache.Abstract;
 using Core.Cache.Concrate;
+using Core.Cache.Redis;
 using Core.Utilities;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -12,9 +14,11 @@ namespace Core.Cache.Memory
     public class MemoryCacheProvider :IMemoryCacheProvider
     {
         private readonly IMemoryCache _memoryCache;
-        public MemoryCacheProvider(IMemoryCache memoryCache)
+        private readonly ICacheFactory _cacheFactory;
+        public MemoryCacheProvider(IMemoryCache memoryCache, ICacheFactory cacheFactory)
         {
             _memoryCache= memoryCache;
+            _cacheFactory = cacheFactory;
         }
 
         public void Add(string key, object data,TimeSpan? timeSpan)
@@ -24,7 +28,7 @@ namespace Core.Cache.Memory
             {
                 AbsoluteExpiration = new DateTimeOffset(DateTime.Now.Add(timeSpan ?? TimeSpan.FromDays(1)))
             };
-            _memoryCache.Set(key, new CacheEntry(key, data, timeSpan), cacheExpOptions);
+            _memoryCache.Set(key, new CacheEntry(_cacheFactory.RedisClientName, key, data, timeSpan), cacheExpOptions);
         }
 
         public async Task<T> AddAsync<T>(string key, Func<Task<T>> func, TimeSpan? timeSpan) where T : class
@@ -34,7 +38,7 @@ namespace Core.Cache.Memory
                  AbsoluteExpiration = new DateTimeOffset(DateTime.Now.Add(timeSpan ?? TimeSpan.FromDays(1)))
             };
              var data = await func();
-            _memoryCache.Set(key, new CacheEntry(key,data,timeSpan),cacheExpOptions);
+            _memoryCache.Set(key, new CacheEntry(_cacheFactory.RedisClientName, key,data,timeSpan),cacheExpOptions);
             return data;
         }
 
@@ -79,7 +83,7 @@ namespace Core.Cache.Memory
             {
                 var resultModel= await func();
                 y.AbsoluteExpiration = new DateTimeOffset(DateTime.Now.Add(timeSpan ?? TimeSpan.FromDays(1)));
-                return new CacheEntry(key,resultModel,timeSpan);
+                return new CacheEntry(_cacheFactory.RedisClientName, key,resultModel,timeSpan);
             }));
 
             return result?.GetData<T>();          

@@ -32,10 +32,11 @@ namespace Core.Cache.Redis
             Subscriber=ConnectionMultiplexer.GetSubscriber();
             //Channel = $"{_projectInfoConfiguration.Value.ProjectName}_{_projectInfoConfiguration.Value.ApplicationName}_Akn_Redis_Channel";
             Channel = "ChannelDeneme";
-
+            ClientName = ConnectionMultiplexer.ClientName;
+            _cacheFactory.RedisClientName = ClientName;
 
             if (_redisConfiguration.Value.MemoryFirst)
-            {
+            {               
                 _memoryCacheProvider = (IMemoryCacheProvider)_cacheFactory.GetProvider(Concrate.CacheTypeEnum.Memory);
                 Subscribe();
             }
@@ -46,7 +47,7 @@ namespace Core.Cache.Redis
         public int CurrentDatabaseId { get; set; }
         public string ConnectionString { get; set; }
         public string Channel { get; set; }
-
+        public string ClientName { get; set; }
 
         public async Task FlushDatabaseAsync()
         {
@@ -59,7 +60,7 @@ namespace Core.Cache.Redis
 
         public Task<long> Publish<T>(string key,T value,TimeSpan? timeSpan) where T:class 
         {
-            var cacheEntry = new CacheEntry(key, value, timeSpan);
+            var cacheEntry = new CacheEntry(ClientName,key, value, timeSpan);
             return Subscriber.PublishAsync(Channel, JsonConvert.SerializeObject(cacheEntry),CommandFlags.FireAndForget);
 
         }
@@ -72,10 +73,16 @@ namespace Core.Cache.Redis
                  _message = message;               
                  var cacheEntry = _message.ToObject<CacheEntry>();              
                  
-                 if (_memoryCacheProvider.Exist(cacheEntry.Key))
-                     _memoryCacheProvider.Remove(cacheEntry.Key);
-                 
-                 _memoryCacheProvider.Add(cacheEntry.Key, JsonConvert.DeserializeObject(cacheEntry.Value), TimeSpan.FromMinutes(cacheEntry.ExpirationTotalMinutes));
+                 if (cacheEntry.ClientName != ClientName) 
+                 {
+
+                     if (_memoryCacheProvider.Exist(cacheEntry.Key))
+                         _memoryCacheProvider.Remove(cacheEntry.Key);
+
+                     _memoryCacheProvider.Add(cacheEntry.Key, JsonConvert.DeserializeObject(cacheEntry.Value), TimeSpan.FromMinutes(cacheEntry.ExpirationTotalMinutes));
+
+
+                 }                    
 
              });
            
