@@ -69,8 +69,11 @@ namespace Core.Cache.Concrate
             var memoryAny = _memoryCacheProvider.Exist(key);
             T result;
 
-            if (memoryAny)
+            if (memoryAny) 
+            { 
                 result = _memoryCacheProvider.Get<T>(key);
+                _redisProvider.GetOrAddAsync<T>(key, func, timeSpan);
+            }
             else
             {
                 result = await _memoryCacheProvider.AddAsync<T>(key, func, timeSpan);
