@@ -78,8 +78,9 @@ namespace Core.Cache.Redis
 
                      if (_memoryCacheProvider.Exist(cacheEntry.Key))
                          _memoryCacheProvider.Remove(cacheEntry.Key);
-
+                   
                      _memoryCacheProvider.Add(cacheEntry.Key, JsonConvert.DeserializeObject(cacheEntry.Value), TimeSpan.FromMinutes(cacheEntry.ExpirationTotalMinutes));
+
 
 
                  }                    
