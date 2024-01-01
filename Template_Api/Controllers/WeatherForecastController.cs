@@ -1,5 +1,6 @@
 ﻿using Core.Bus.Abstract;
 using Core.Cache.Abstract;
+using Core.Database.EF.Abstract;
 using Core.Elastic.Abstract;
 using Core.LogAkn.Abstract;
 using Core.LogAkn.Extantions;
@@ -29,12 +30,14 @@ namespace Template_Api.Controllers
         private readonly IAknUser _aknUser;
         private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
         private readonly ICacheManager _cacheManager;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser, ICacheManager cacheManager, IRabbitMqProvider<BusMessageTest> rabbitMqProvider)
+        private readonly IEfUnitofWork _efUnitOfWork;
+        public WeatherForecastController( ILogService logService, IAknUser aknUser, ICacheManager cacheManager, IRabbitMqProvider<BusMessageTest> rabbitMqProvider, IEfUnitofWork efUnitOfWork)
         {     
             _logService = logService;
            _aknUser = aknUser;
             _cacheManager = cacheManager;
             _rabbitMqProvider = rabbitMqProvider;
+            _efUnitOfWork= efUnitOfWork;
       
         }
 
@@ -51,20 +54,28 @@ namespace Template_Api.Controllers
         {
             var stringKey = "BusMessage:Deneme:3939";
 
-          
 
-            var result= await _cacheManager.GetOrAddMemoryFirstAsync<BusMessageTest>(stringKey,async ()=>
-            {
-              // await _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });
-               // var logresult= await _rabbitMqProvider.MessageCount();
-                return new BusMessageTest() 
-                { 
-                 Deneme="memoryFirsDenemesi"
-                };
-            },TimeSpan.FromDays(30));
+            var a =_efUnitOfWork.GetRepository<UserEntity>();
+          var b = await a.GetAsync();
 
 
-            return await _cacheManager.GetMemoryFirstAsync<BusMessageTest>(stringKey);
+
+
+
+
+            return Summaries;
+            //var result= await _cacheManager.GetOrAddMemoryFirstAsync<BusMessageTest>(stringKey,async ()=>
+            //{
+            //  // await _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });
+            //   // var logresult= await _rabbitMqProvider.MessageCount();
+            //    return new BusMessageTest() 
+            //    { 
+            //     Deneme="memoryFirsDenemesi"
+            //    };
+            //},TimeSpan.FromDays(30));
+
+
+            //return await _cacheManager.GetMemoryFirstAsync<BusMessageTest>(stringKey);
            // var result=  _cacheManager.Get<BusMessageTest>(stringKey);
           
             //var userhttpContext = HttpContext.User;

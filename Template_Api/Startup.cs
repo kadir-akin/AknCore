@@ -1,6 +1,7 @@
 using Core.Bus.Extantions;
 using Core.Bus.RabbitMq;
 using Core.Cache.Extantions;
+using Core.Database.Extantions;
 using Core.Elastic.Abstract;
 using Core.Elastic.Concrate;
 using Core.Elastic.Extantions;
@@ -57,7 +58,8 @@ namespace Template_Api
             services.AddRabbitBus().RabbitMqPublish<BusMessageTest>();
             //  .RabbitMqSubcribeAndPublish<BusMessageTest>()
             //.RabbitMqPublish<DenemeMessageTest>();
-            services.AddAknCache();
+            //services.AddAknCache();
+            services.AddEFAknDbContext();
 
 
 
