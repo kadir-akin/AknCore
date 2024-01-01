@@ -1,7 +1,8 @@
 ﻿using Core.Database.EF.Abstract;
-using Core.Database.UnitofWork.Abstract;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,39 +11,55 @@ namespace Core.Database.EF.Concrate
 {
     public class EfUnitOfWorkRepository<TEntity> : IEfUnitOfWorkRepository<TEntity> where TEntity : class, IEntity
     {
-        public Task AddAsync(TEntity entity)
+        protected readonly DbContext Context;
+        public EfUnitOfWorkRepository( DbContext context)
         {
-            throw new NotImplementedException();
+            Context = context;  
+        }
+        public async Task<TEntity> AddAsync(TEntity entity)
+        {
+           var result=  await Context.Set<TEntity>().AddAsync(entity);
+           return result.Entity;
         }
 
-        public Task AddRangeAsync(IEnumerable<TEntity> entities)
+        public async Task AddRangeAsync(IEnumerable<TEntity> entities)
         {
-            throw new NotImplementedException();
+            await Context.Set<TEntity>().AddRangeAsync(entities);
         }
 
-        public Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> predicate)
+        public Task<TEntity> GetAsync(Expression<Func<TEntity, bool>> predicate =null)
         {
-            throw new NotImplementedException();
+            if (predicate==null)
+            {
+                return Context.Set<TEntity>().FirstOrDefaultAsync();
+            }
+            return Context.Set<TEntity>().Where(predicate)?.FirstOrDefaultAsync();
         }
 
-        public TEntity GetByIdAsync(int id)
+        public async Task<TEntity> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            return await Context.Set<TEntity>().FindAsync(id);
         }
 
-        public IEnumerable<TEntity> GetListAsync(Expression<Func<TEntity, bool>> predicate)
+        public async Task<IEnumerable<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate=null)
         {
-            throw new NotImplementedException();
+            if (predicate == null)
+            {
+                return await Context.Set<TEntity>().ToListAsync();
+            }
+            return await Context.Set<TEntity>().Where(predicate)?.ToListAsync();
         }
 
         public Task RemoveAsync(TEntity entity)
         {
-            throw new NotImplementedException();
+            Context.Set<TEntity>().Remove(entity);
+            return Task.CompletedTask;
         }
 
         public Task RemoveRangeAsync(IEnumerable<TEntity> entities)
         {
-            throw new NotImplementedException();
+            Context.Set<TEntity>().RemoveRange(entities);
+            return Task.CompletedTask;
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿using Core.Database.EF.Abstract;
+﻿using Core.Database.EF.Concrate;
 using System;
 using System.Threading.Tasks;
 
-namespace Core.Database.UnitofWork.Abstract
+namespace Core.Database.EF.Abstract
 {
     public interface IEfUnitofWork 
     {
