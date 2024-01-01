@@ -41,10 +41,11 @@ namespace Core.Database.EF.Concrate
         {
             if (Repositorys.ContainsKey(typeof(TEntity)))
             {
-               return (IEfUnitOfWorkRepository<TEntity>)Repositorys[typeof(TEntity)];
+               Repositorys.TryGetValue(typeof(TEntity), out var repository);
+               return (IEfUnitOfWorkRepository<TEntity>)repository;
             }
             var result = (EfUnitOfWorkRepository<TEntity>)Activator.CreateInstance(typeof(EfUnitOfWorkRepository<TEntity>));
-           
+            Repositorys.TryAdd(typeof(TEntity), result);
             return result;      
         }
 
