@@ -20,12 +20,12 @@ namespace Core.Database.EF.Concrate
             return Context.Database.CommitTransactionAsync();
         }
 
-        public async Task<TResult> ExecuteAsync<TInput, TResult>(Func<TInput,Task<TResult>> func) where TInput : class,new()
+        public async Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> func)
         {
             try
             {
                 await StartTransactionAsync();
-                var result = await func(new TInput());
+                var result = await func();
                 await CommitTransactionAsync();
                 return result;
             }

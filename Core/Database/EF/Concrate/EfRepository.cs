@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Core.Database.EF.Concrate
 {
-    internal class EfRepository<TEntity> : IEfRepository<TEntity> where TEntity : class, IEntity
+    public class EfRepository<TEntity> : IEfRepository<TEntity> where TEntity : class, IEntity
     { 
         protected readonly DbContext Context;
         public EfRepository(DbContext context)

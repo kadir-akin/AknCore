@@ -13,7 +13,7 @@ namespace Core.Database.EF.Abstract
         public Task RollBackTransactionAsync();
         public Task CommitTransactionAsync();
 
-        public Task<TResult> ExecuteAsync<TInput, TResult>(Func<TInput, Task<TResult>> func) where TInput : class, new();
+        public Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> func);
 
     }
 }
