@@ -1,4 +1,5 @@
 ﻿using Core.Database.EF.Abstract;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Core.Database.EF.Abstract
 {
-    public interface IEfUnitOfWorkRepository<TEntity> where TEntity : class, IEntity
+    public interface IEfUnitOfWorkRepository<TEntity> where TEntity : class, IEntity 
     {
         public Task<TEntity> AddAsync(TEntity entity);
 

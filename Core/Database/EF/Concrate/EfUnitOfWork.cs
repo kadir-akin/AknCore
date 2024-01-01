@@ -7,13 +7,15 @@ using System.Threading.Tasks;
 
 namespace Core.Database.EF.Concrate
 {
-    public class EfUnitOfWork : IEfUnitofWork
+    public class EfUnitOfWork<TContext> :IEfUnitofWork where TContext : DbContext   
     {
-        protected readonly DbContext Context;
-        public ConcurrentDictionary<Type, object> Repositorys  { get; set; } 
-        public EfUnitOfWork(DbContext context)
+        protected readonly TContext Context;
+        private readonly IServiceProvider _serviceProvider;
+        public ConcurrentDictionary<Type, object> Repositorys { get; set; } = new ConcurrentDictionary<Type, object>();
+        public EfUnitOfWork(TContext aknDbContext, IServiceProvider serviceProvider) 
         {
-            this.Context = context;
+            this.Context = aknDbContext;
+            _serviceProvider = serviceProvider;
         }
         public Task CommitTransactionAsync()
         {
@@ -44,9 +46,9 @@ namespace Core.Database.EF.Concrate
                Repositorys.TryGetValue(typeof(TEntity), out var repository);
                return (IEfUnitOfWorkRepository<TEntity>)repository;
             }
-            var result = (EfUnitOfWorkRepository<TEntity>)Activator.CreateInstance(typeof(EfUnitOfWorkRepository<TEntity>));
+            var result = _serviceProvider.GetService(typeof(IEfUnitOfWorkRepository<TEntity>));
             Repositorys.TryAdd(typeof(TEntity), result);
-            return result;      
+            return (IEfUnitOfWorkRepository<TEntity>)result;      
         }
 
         public Task RollBackTransactionAsync()

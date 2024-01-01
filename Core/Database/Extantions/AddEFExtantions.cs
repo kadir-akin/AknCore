@@ -13,7 +13,7 @@ namespace Core.Database.Extantions
 {
     public static class AddEFExtantions
     {
-        public static IServiceCollection AddEFAknDbContext(this IServiceCollection services)
+        public static IServiceCollection AddEFAknDbContext<TContext>(this IServiceCollection services) where TContext : DbContext
         {
 
             var _configuration = services.BuildServiceProvider().GetService<IConfiguration>();
@@ -24,15 +24,16 @@ namespace Core.Database.Extantions
             services.Configure<MsSqlConfiguration>(msSqlSection);
 
             var msSqlConfig =services.BuildServiceProvider().GetService<IOptions<MsSqlConfiguration>>();
-           
-            services.AddDbContext<AknDbContext>(options =>
+   
+            services.AddDbContext<TContext>(options =>
             {
                 options.UseSqlServer($"Server={msSqlConfig.Value.Server};Database={msSqlConfig.Value.Database};trusted_connection=true;User Id={msSqlConfig.Value.UserName};Password={msSqlConfig.Value.Password};");
             });
 
             if (msSqlConfig.Value.UseUnitOfWork)
             {
-                services.AddSingleton(typeof(IEfUnitofWork), typeof(EfUnitOfWork));
+                services.AddScoped(typeof(IEfUnitofWork), typeof(EfUnitOfWork<TContext>));
+                services.AddScoped(typeof(IEfUnitOfWorkRepository<>),typeof( EfUnitOfWorkRepository<TContext,>));
             }
 
             return services;

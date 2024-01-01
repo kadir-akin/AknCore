@@ -31,12 +31,12 @@ namespace Template_Api.Controllers
         private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
         private readonly ICacheManager _cacheManager;
         private readonly IEfUnitofWork _efUnitOfWork;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser, ICacheManager cacheManager, IRabbitMqProvider<BusMessageTest> rabbitMqProvider, IEfUnitofWork efUnitOfWork)
+        public WeatherForecastController( ILogService logService, IAknUser aknUser, IEfUnitofWork efUnitOfWork)
         {     
             _logService = logService;
            _aknUser = aknUser;
-            _cacheManager = cacheManager;
-            _rabbitMqProvider = rabbitMqProvider;
+            //_cacheManager = cacheManager;
+            //_rabbitMqProvider = rabbitMqProvider;
             _efUnitOfWork= efUnitOfWork;
       
         }

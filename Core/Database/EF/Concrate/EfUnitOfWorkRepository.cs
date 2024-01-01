@@ -9,10 +9,10 @@ using System.Threading.Tasks;
 
 namespace Core.Database.EF.Concrate
 {
-    public class EfUnitOfWorkRepository<TEntity> : IEfUnitOfWorkRepository<TEntity> where TEntity : class, IEntity
+    public class EfUnitOfWorkRepository<TContext,TEntity> : IEfUnitOfWorkRepository<TEntity> where TEntity : class, IEntity where TContext:DbContext
     {
-        protected readonly DbContext Context;
-        public EfUnitOfWorkRepository( DbContext context)
+        protected readonly TContext Context;
+        public EfUnitOfWorkRepository(TContext context)
         {
             Context = context;  
         }

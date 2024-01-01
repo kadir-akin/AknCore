@@ -59,7 +59,7 @@ namespace Template_Api
             //  .RabbitMqSubcribeAndPublish<BusMessageTest>()
             //.RabbitMqPublish<DenemeMessageTest>();
             //services.AddAknCache();
-            services.AddEFAknDbContext();
+            services.AddEFAknDbContext<TemplateApiDbContext>();
 
 
 
