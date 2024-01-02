@@ -24,16 +24,13 @@ namespace Core.Database.Extantions
             services.Configure<MsSqlConfiguration>(msSqlSection);
 
             var msSqlConfig =services.BuildServiceProvider().GetService<IOptions<MsSqlConfiguration>>();
-   
-            services.AddDbContext<TContext>(options =>
-            {
-                options.UseSqlServer($"Server={msSqlConfig.Value.Server};Database={msSqlConfig.Value.Database};trusted_connection=true;User Id={msSqlConfig.Value.UserName};Password={msSqlConfig.Value.Password};");
-            });
-
+           
+            Action<DbContextOptionsBuilder> dbOptions = options=> options.UseSqlServer($"Server={msSqlConfig.Value.Server};Database={msSqlConfig.Value.Database};trusted_connection=true;User Id={msSqlConfig.Value.UserName};Password={msSqlConfig.Value.Password};");
+            services.AddDbContext<TContext> (dbOptions);
+            services.AddDbContext<AknDbContext>(dbOptions);
             if (msSqlConfig.Value.UseUnitOfWork)
             {
-                services.AddScoped(typeof(IEfUnitofWork), typeof(EfUnitOfWork<TContext>));
-                services.AddScoped(typeof(IEfUnitOfWorkRepository<>),typeof( EfUnitOfWorkRepository<TContext,>));
+                services.AddScoped(typeof(IEfUnitofWork), typeof(EfUnitOfWork<TContext>));              
             }
 
             return services;

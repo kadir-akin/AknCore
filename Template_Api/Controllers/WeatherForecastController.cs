@@ -58,6 +58,12 @@ namespace Template_Api.Controllers
             var a =_efUnitOfWork.GetRepository<UserEntity>();
           var b = await a.GetAsync();
 
+         var c=   await _efUnitOfWork.ExecuteAsync<UserEntity>(async ()=>
+            {
+
+              return await _efUnitOfWork.GetRepository<UserEntity>().AddAsync(new UserEntity() { FirstName = "Kadir Test", LastName = "Kadir Test LAst Name" });
+            });
+
 
 
 

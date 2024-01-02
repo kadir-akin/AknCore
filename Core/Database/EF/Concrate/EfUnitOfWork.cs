@@ -10,16 +10,16 @@ namespace Core.Database.EF.Concrate
     public class EfUnitOfWork<TContext> :IEfUnitofWork where TContext : DbContext   
     {
         protected readonly TContext Context;
-        private readonly IServiceProvider _serviceProvider;
         public ConcurrentDictionary<Type, object> Repositorys { get; set; } = new ConcurrentDictionary<Type, object>();
-        public EfUnitOfWork(TContext aknDbContext, IServiceProvider serviceProvider) 
+        private Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction DbContextTransaction;
+        public EfUnitOfWork(TContext aknDbContext) 
         {
             this.Context = aknDbContext;
-            _serviceProvider = serviceProvider;
         }
-        public Task CommitTransactionAsync()
+        public async Task CommitTransactionAsync()
         {
-            return Context.Database.CommitTransactionAsync();
+             await Context.SaveChangesAsync();
+             await DbContextTransaction.CommitAsync();
         }
 
         public async Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> func)
@@ -46,19 +46,19 @@ namespace Core.Database.EF.Concrate
                Repositorys.TryGetValue(typeof(TEntity), out var repository);
                return (IEfUnitOfWorkRepository<TEntity>)repository;
             }
-            var result = _serviceProvider.GetService(typeof(IEfUnitOfWorkRepository<TEntity>));
+            var result = new EfUnitOfWorkRepository<TContext, TEntity>(Context);
             Repositorys.TryAdd(typeof(TEntity), result);
-            return (IEfUnitOfWorkRepository<TEntity>)result;      
+            return result;      
         }
 
         public Task RollBackTransactionAsync()
         {
-            return Context.Database.RollbackTransactionAsync();
+            return DbContextTransaction.RollbackAsync();
         }
 
-        public Task StartTransactionAsync()
+        public async Task StartTransactionAsync()
         {
-            return Context.Database.BeginTransactionAsync();
+            DbContextTransaction=await Context.Database.BeginTransactionAsync();
         }
     }
 }
