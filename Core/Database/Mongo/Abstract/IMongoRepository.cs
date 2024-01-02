@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Core.Database.Mongo.Abstract
 {
-    public interface IMongoRepository<TCollection> where TCollection : class,IMongoCollection
+    public interface IMongoRepository<TCollection> where TCollection : class,IAknMongoCollection
     {
         IQueryable<TCollection> Get(Expression<Func<TCollection, bool>> predicate = null);
         Task<TCollection> GetAsync(Expression<Func<TCollection, bool>> predicate);

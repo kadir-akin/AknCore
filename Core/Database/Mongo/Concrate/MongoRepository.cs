@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Core.Database.Mongo.Concrate
 {
-    public class MongoRepository<TCollection> : IMongoRepository<TCollection> where TCollection : class, IMongoCollection
+    public class MongoRepository<TCollection> : IMongoRepository<TCollection> where TCollection : class, IAknMongoCollection
     {
         private readonly IOptions<MongoConfiguration> _mongoConfig;
         protected readonly IMongoCollection<TCollection> Collection;
@@ -21,54 +21,59 @@ namespace Core.Database.Mongo.Concrate
             var db = client.GetDatabase(_mongoConfig.Value.Database);
             this.Collection = db.GetCollection<TCollection>(typeof(TCollection).Name.ToLowerInvariant());
         }
-        public Task<TCollection> AddAsync(TCollection entity)
+        public async Task<TCollection> AddAsync(TCollection entity)
         {
-            throw new NotImplementedException();
+            var options = new InsertOneOptions { BypassDocumentValidation = false };
+            await Collection.InsertOneAsync(entity, options);
+            return entity;
         }
 
-        public Task<bool> AddRangeAsync(IEnumerable<TCollection> entities)
+        public async Task<bool> AddRangeAsync(IEnumerable<TCollection> entities)
         {
-            throw new NotImplementedException();
+            var options = new BulkWriteOptions { IsOrdered = false, BypassDocumentValidation = false };
+            return (await Collection.BulkWriteAsync((IEnumerable<WriteModel<TCollection>>)entities, options)).IsAcknowledged;
         }
 
         public Task<TCollection> DeleteAsync(TCollection entity)
         {
-            throw new NotImplementedException();
+            return  Collection.FindOneAndDeleteAsync(x => x.Id == entity.Id);
         }
 
         public Task<TCollection> DeleteAsync(string id)
         {
-            throw new NotImplementedException();
+            return  Collection.FindOneAndDeleteAsync(x => x.Id == id);
         }
 
         public Task<TCollection> DeleteAsync(Expression<Func<TCollection, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return  Collection.FindOneAndDeleteAsync(predicate);
         }
 
         public IQueryable<TCollection> Get(Expression<Func<TCollection, bool>> predicate = null)
         {
-            throw new NotImplementedException();
+            return predicate == null
+                 ? Collection.AsQueryable()
+                 : Collection.AsQueryable().Where(predicate);
         }
 
         public Task<TCollection> GetAsync(Expression<Func<TCollection, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return Collection.Find(predicate).FirstOrDefaultAsync();
         }
 
         public Task<TCollection> GetByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            return Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
         }
 
         public Task<TCollection> UpdateAsync(string id, TCollection entity)
         {
-            throw new NotImplementedException();
+            return  Collection.FindOneAndReplaceAsync(x => x.Id == id, entity);
         }
 
         public Task<TCollection> UpdateAsync(TCollection entity, Expression<Func<TCollection, bool>> predicate)
         {
-            throw new NotImplementedException();
+            return  Collection.FindOneAndReplaceAsync(predicate, entity);
         }
     }
 }

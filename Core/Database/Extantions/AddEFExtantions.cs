@@ -13,7 +13,7 @@ namespace Core.Database.Extantions
 {
     public static class AddEFExtantions
     {
-        public static IServiceCollection AddEFAknDbContext<TContext>(this IServiceCollection services) where TContext : DbContext
+        public static IServiceCollection AddEFAknDbContext<TContext>(this IServiceCollection services,Action<IServiceCollection> action=null) where TContext : DbContext
         {
 
             var _configuration = services.BuildServiceProvider().GetService<IConfiguration>();
@@ -31,6 +31,11 @@ namespace Core.Database.Extantions
             if (msSqlConfig.Value.UseUnitOfWork)
             {
                 services.AddScoped(typeof(IEfUnitofWork), typeof(EfUnitOfWork<TContext>));              
+            }
+
+            if (action !=null)
+            {
+                action.Invoke(services);
             }
 
             return services;

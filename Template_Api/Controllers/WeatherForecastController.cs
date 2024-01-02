@@ -31,13 +31,17 @@ namespace Template_Api.Controllers
         private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
         private readonly ICacheManager _cacheManager;
         private readonly IEfUnitofWork _efUnitOfWork;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser, IEfUnitofWork efUnitOfWork)
+        private readonly IMongoExampleRepository _mongoExampleRepository;
+        private readonly IMongoCustomerRepository _mongoCustomerRepository;
+        public WeatherForecastController( ILogService logService, IAknUser aknUser, IEfUnitofWork efUnitOfWork, IMongoExampleRepository mongoExampleRepository, IMongoCustomerRepository mongoCustomerRepository)
         {     
             _logService = logService;
            _aknUser = aknUser;
             //_cacheManager = cacheManager;
             //_rabbitMqProvider = rabbitMqProvider;
             _efUnitOfWork= efUnitOfWork;
+            _mongoExampleRepository = mongoExampleRepository;
+            _mongoCustomerRepository = mongoCustomerRepository; 
       
         }
 
@@ -65,11 +69,20 @@ namespace Template_Api.Controllers
             });
 
 
+            var resultAddMongo = await _mongoExampleRepository.AddAsync(new MongoExampleCollection()
+            {
+
+                FirstName = "Deneme verisi 2",
+                Name = "Deneme versii 2",
+                Age=15,
+                CreateDate = DateTime.UtcNow,  
+            });
+
+            var getResultMongo = _mongoExampleRepository.Get()?.ToList();
 
 
 
-
-            return Summaries;
+            return getResultMongo;
             //var result= await _cacheManager.GetOrAddMemoryFirstAsync<BusMessageTest>(stringKey,async ()=>
             //{
             //  // await _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });

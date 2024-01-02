@@ -60,7 +60,11 @@ namespace Template_Api
             //.RabbitMqPublish<DenemeMessageTest>();
             //services.AddAknCache();
             services.AddEFAknDbContext<TemplateApiDbContext>();
+            services.AddMongoDb(services => {
 
+                services.AddSingleton(typeof(IMongoExampleRepository),typeof(MongoExampleRepository));
+                services.AddSingleton(typeof(IMongoCustomerRepository), typeof(MongoCustomerRepository));
+            });
 
 
         }
