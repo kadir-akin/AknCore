@@ -1,6 +1,8 @@
 ﻿using Core.Bus.Abstract;
 using Core.Cache.Abstract;
 using Core.Database.EF.Abstract;
+using Core.Database.Mongo.Abstract;
+using Core.Database.Mongo.Concrate;
 using Core.Elastic.Abstract;
 using Core.LogAkn.Abstract;
 using Core.LogAkn.Extantions;
@@ -32,8 +34,8 @@ namespace Template_Api.Controllers
         private readonly ICacheManager _cacheManager;
         private readonly IEfUnitofWork _efUnitOfWork;
         private readonly IMongoExampleRepository _mongoExampleRepository;
-        private readonly IMongoCustomerRepository _mongoCustomerRepository;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser, IEfUnitofWork efUnitOfWork, IMongoExampleRepository mongoExampleRepository, IMongoCustomerRepository mongoCustomerRepository)
+        private readonly IMongoUnitOfWork  _mongoUnitOfWork;
+        public WeatherForecastController( ILogService logService, IAknUser aknUser, IEfUnitofWork efUnitOfWork, IMongoExampleRepository mongoExampleRepository, IMongoUnitOfWork mongoUnitOfWork)
         {     
             _logService = logService;
            _aknUser = aknUser;
@@ -41,7 +43,7 @@ namespace Template_Api.Controllers
             //_rabbitMqProvider = rabbitMqProvider;
             _efUnitOfWork= efUnitOfWork;
             _mongoExampleRepository = mongoExampleRepository;
-            _mongoCustomerRepository = mongoCustomerRepository; 
+            _mongoUnitOfWork = mongoUnitOfWork; 
       
         }
 
@@ -58,31 +60,52 @@ namespace Template_Api.Controllers
         {
             var stringKey = "BusMessage:Deneme:3939";
 
+            var mongoUnitof = await _mongoUnitOfWork.ExecuteAsync<List<MongoExampleCollection>>(async (x) =>
+             {
+                 var exampleRepository = x.GetRepository<MongoExampleCollection>();
 
-            var a =_efUnitOfWork.GetRepository<UserEntity>();
-          var b = await a.GetAsync();
+                 await exampleRepository.AddAsync(new MongoExampleCollection()
+                 {
+                     FirstName = "Galatasaray 2"
 
-         var c=   await _efUnitOfWork.ExecuteAsync<UserEntity>(async ()=>
-            {
+                 });
+                 if (test.Id == 4)
+                 {
+                     int b1 = 0;
+                     int b2 = 3;
+                     int b3 = b1 / b2;
+                 }
 
-              return await _efUnitOfWork.GetRepository<UserEntity>().AddAsync(new UserEntity() { FirstName = "Kadir Test", LastName = "Kadir Test LAst Name" });
-            });
+                 return exampleRepository.Get()?.ToList();
 
-
-            var resultAddMongo = await _mongoExampleRepository.AddAsync(new MongoExampleCollection()
-            {
-
-                FirstName = "Deneme verisi 2",
-                Name = "Deneme versii 2",
-                Age=15,
-                CreateDate = DateTime.UtcNow,  
-            });
-
-            var getResultMongo = _mongoExampleRepository.Get()?.ToList();
+             });
 
 
+            //return mongoUnitof;
+            //   var a =_efUnitOfWork.GetRepository<UserEntity>();
+            // var b = await a.GetAsync();
 
-            return getResultMongo;
+            //var c=   await _efUnitOfWork.ExecuteAsync<UserEntity>(async ()=>
+            //   {
+
+            //     return await _efUnitOfWork.GetRepository<UserEntity>().AddAsync(new UserEntity() { FirstName = "Kadir Test", LastName = "Kadir Test LAst Name" });
+            //   });
+
+
+            //var resultAddMongo = await _mongoExampleRepository.AddAsync(new MongoExampleCollection()
+            //{
+
+            //    FirstName = "Deneme verisi 2",
+            //    Name = "Deneme versii 2",
+            //    Age = 15,
+            //    CreateDate = DateTime.UtcNow,
+            //});
+
+            //var getResultMongo = _mongoExampleRepository.Get()?.ToList();
+            //return getResultMongo;
+
+
+            //return getResultMongo;
             //var result= await _cacheManager.GetOrAddMemoryFirstAsync<BusMessageTest>(stringKey,async ()=>
             //{
             //  // await _rabbitMqProvider.Publish(new BusMessageTest() { Deneme = "Test verisi girrildi  " + Guid.NewGuid().ToString() });
@@ -95,8 +118,8 @@ namespace Template_Api.Controllers
 
 
             //return await _cacheManager.GetMemoryFirstAsync<BusMessageTest>(stringKey);
-           // var result=  _cacheManager.Get<BusMessageTest>(stringKey);
-          
+            // var result=  _cacheManager.Get<BusMessageTest>(stringKey);
+
             //var userhttpContext = HttpContext.User;
             //var threadUser = AknUserUtilities.GetCurrentUser();
             //await _elasticSearchProvider.ChekIndex();
@@ -120,6 +143,7 @@ namespace Template_Api.Controllers
 
             //_logService.LogInformationAsync("{0} logu eklendi user Id :{1}","Kadir akın", userID);
             //return result;
+            return Summaries;
         }
 
         [HttpPost]

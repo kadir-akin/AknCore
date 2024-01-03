@@ -1,6 +1,7 @@
 ﻿using Core.Database.Mongo.Abstract;
 using Core.Database.Mongo.Concrate;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace Template_Api
 {
@@ -9,7 +10,7 @@ namespace Template_Api
     }
     public class MongoExampleRepository : MongoRepository<MongoExampleCollection>, IMongoExampleRepository
     {
-        public MongoExampleRepository(IOptions<MongoConfiguration> mongoConfig) : base(mongoConfig)
+        public MongoExampleRepository(IOptions<MongoConfiguration> mongoConfig, IMongoDatabase mongoDatabase) : base(mongoConfig, mongoDatabase)
         {
         }
     }
@@ -19,7 +20,7 @@ namespace Template_Api
     }
     public class MongoCustomerRepository : MongoRepository<MongoCustomerCollection>, IMongoCustomerRepository
     {
-        public MongoCustomerRepository(IOptions<MongoConfiguration> mongoConfig) : base(mongoConfig)
+        public MongoCustomerRepository(IOptions<MongoConfiguration> mongoConfig, IMongoDatabase mongoDatabase) : base(mongoConfig, mongoDatabase)
         {
         }
     }

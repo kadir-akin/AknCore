@@ -3,6 +3,7 @@ using Core.Database.Mongo.Concrate;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -22,15 +23,26 @@ namespace Core.Database.Extantions
             services.Configure<MongoConfiguration>(mongoSection);
 
             var mongoConfig = services.BuildServiceProvider().GetService<IOptions<MongoConfiguration>>();
+                        
+            services.AddTransient<IMongoClient>(sp => 
+            {
+                var client= new MongoClient($"mongodb://{mongoConfig.Value.UserName}:{mongoConfig.Value.Password}@{mongoConfig.Value.Server}?retryWrites=false");
+                //var client = new MongoClient($"mongodb://{mongoConfig.Value.Server}");
+                return client;
+            });
 
-            if (action !=null)
+            services.AddTransient(sp =>
+            {
+                var client = sp.GetService<IMongoClient>();
+                return client.GetDatabase(mongoConfig.Value.Database);
+            });
+
+            services.AddTransient<IMongoSessionFactory, MongoSessionFactory>();
+            services.AddScoped<IMongoUnitOfWork, MongoUnitOfWork>();
+           
+            if (action != null)
             {
                 action.Invoke(services);
-            }
-           
-            if (mongoConfig.Value.UseUnitOfWork)
-            {
-                //services.AddScoped(typeof(IEfUnitofWork), typeof(EfUnitOfWork<TContext>));
             }
 
             return services;

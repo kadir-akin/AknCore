@@ -14,7 +14,6 @@ namespace Core.Database.Mongo.Abstract
         Task<TCollection> GetByIdAsync(string id);
         Task<TCollection> AddAsync(TCollection entity);
         Task<bool> AddRangeAsync(IEnumerable<TCollection> entities);
-        Task<TCollection> UpdateAsync(string id, TCollection entity);
         Task<TCollection> UpdateAsync(TCollection entity, Expression<Func<TCollection, bool>> predicate);
         Task<TCollection> DeleteAsync(TCollection entity);
         Task<TCollection> DeleteAsync(string id);

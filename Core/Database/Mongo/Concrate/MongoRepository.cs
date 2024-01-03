@@ -13,40 +13,77 @@ namespace Core.Database.Mongo.Concrate
     public class MongoRepository<TCollection> : IMongoRepository<TCollection> where TCollection : class, IAknMongoCollection
     {
         private readonly IOptions<MongoConfiguration> _mongoConfig;
+        private readonly IMongoDatabase _mongoDatabase;
         protected readonly IMongoCollection<TCollection> Collection;
-        public MongoRepository(IOptions<MongoConfiguration> mongoConfig)
+        public IClientSessionHandle Session { get; set; }
+        public MongoRepository(IOptions<MongoConfiguration> mongoConfig, IMongoDatabase mongoDatabase)
         {
             _mongoConfig = mongoConfig;
-            var client = new MongoClient($"mongodb://{_mongoConfig.Value.UserName}:{_mongoConfig.Value.Password}@{_mongoConfig.Value.Server}");            
-            var db = client.GetDatabase(_mongoConfig.Value.Database);
-            this.Collection = db.GetCollection<TCollection>(typeof(TCollection).Name.ToLowerInvariant());
+            _mongoDatabase = mongoDatabase;
+            this.Collection = _mongoDatabase.GetCollection<TCollection>(typeof(TCollection).Name.ToLowerInvariant());
         }
+        public MongoRepository(IOptions<MongoConfiguration> mongoConfig, IMongoDatabase mongoDatabase, IClientSessionHandle session)
+        {
+            _mongoConfig = mongoConfig;
+            _mongoDatabase = mongoDatabase;
+            Session = session;
+            this.Collection = _mongoDatabase.GetCollection<TCollection>(typeof(TCollection).Name.ToLowerInvariant());
+        }
+       
         public async Task<TCollection> AddAsync(TCollection entity)
         {
             var options = new InsertOneOptions { BypassDocumentValidation = false };
-            await Collection.InsertOneAsync(entity, options);
+            if (Session ==null)
+            {
+                await Collection.InsertOneAsync(entity, options);
+                return entity;
+            }
+
+            await Collection.InsertOneAsync(Session,entity, options);
             return entity;
         }
 
         public async Task<bool> AddRangeAsync(IEnumerable<TCollection> entities)
         {
-            var options = new BulkWriteOptions { IsOrdered = false, BypassDocumentValidation = false };
-            return (await Collection.BulkWriteAsync((IEnumerable<WriteModel<TCollection>>)entities, options)).IsAcknowledged;
+            if (Session==null)
+            {
+                var options = new BulkWriteOptions { IsOrdered = false, BypassDocumentValidation = false };
+                return (await Collection.BulkWriteAsync((IEnumerable<WriteModel<TCollection>>)entities, options)).IsAcknowledged;
+            }
+
+            var optionsSes = new BulkWriteOptions { IsOrdered = false, BypassDocumentValidation = false };
+            return (await Collection.BulkWriteAsync(Session,(IEnumerable<WriteModel<TCollection>>)entities, optionsSes)).IsAcknowledged;
+
         }
 
         public Task<TCollection> DeleteAsync(TCollection entity)
         {
-            return  Collection.FindOneAndDeleteAsync(x => x.Id == entity.Id);
+            if (Session==null)
+                return Collection.FindOneAndDeleteAsync(x => x.Id == entity.Id);
+            else
+                return Collection.FindOneAndDeleteAsync(Session,x => x.Id == entity.Id);
+
         }
 
         public Task<TCollection> DeleteAsync(string id)
         {
-            return  Collection.FindOneAndDeleteAsync(x => x.Id == id);
+            if (Session == null)
+                return Collection.FindOneAndDeleteAsync(x => x.Id == id);
+            else
+                return Collection.FindOneAndDeleteAsync(Session, x => x.Id == id);
         }
 
         public Task<TCollection> DeleteAsync(Expression<Func<TCollection, bool>> predicate)
         {
-            return  Collection.FindOneAndDeleteAsync(predicate);
+            if (Session==null)
+            {
+                return Collection.FindOneAndDeleteAsync(predicate);
+            }
+            else
+            {
+                return Collection.FindOneAndDeleteAsync(Session,predicate);
+            }
+           
         }
 
         public IQueryable<TCollection> Get(Expression<Func<TCollection, bool>> predicate = null)
@@ -65,15 +102,16 @@ namespace Core.Database.Mongo.Concrate
         {
             return Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
         }
-
-        public Task<TCollection> UpdateAsync(string id, TCollection entity)
-        {
-            return  Collection.FindOneAndReplaceAsync(x => x.Id == id, entity);
-        }
-
+    
         public Task<TCollection> UpdateAsync(TCollection entity, Expression<Func<TCollection, bool>> predicate)
         {
-            return  Collection.FindOneAndReplaceAsync(predicate, entity);
+            if (Session==null)
+            {
+                return Collection.FindOneAndReplaceAsync( predicate, entity);
+            }
+
+            return Collection.FindOneAndReplaceAsync(Session, predicate, entity);
+
         }
     }
 }
