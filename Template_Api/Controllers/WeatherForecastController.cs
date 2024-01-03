@@ -69,11 +69,11 @@ namespace Template_Api.Controllers
                      FirstName = "Galatasaray 2"
 
                  });
-                 if (test.Id == 4)
+                 if (test.Name == "kadir akın1")
                  {
                      int b1 = 0;
                      int b2 = 3;
-                     int b3 = b1 / b2;
+                     int b3 = b2 / b1;
                  }
 
                  return exampleRepository.Get()?.ToList();
