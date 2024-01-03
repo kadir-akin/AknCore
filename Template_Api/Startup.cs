@@ -55,9 +55,13 @@ namespace Template_Api
             services.AddControllers();                    
             services.AddLocalizationService();                                
             services.AddAknLogDependency();
-            services.AddRabbitBus().RabbitMqPublish<BusMessageTest>();
-            //  .RabbitMqSubcribeAndPublish<BusMessageTest>()
-            //.RabbitMqPublish<DenemeMessageTest>();
+            services.AddRabbitBus(sp =>
+            {
+                sp.RabbitMqPublish<BusMessageTest>();
+              //sp.RabbitMqSubcribeAndPublish<BusMessageTest>()
+              //sp.RabbitMqPublish<DenemeMessageTest>();
+            });
+           
             //services.AddAknCache();
             services.AddEFAknDbContext<TemplateApiDbContext>();
             services.AddMongoDb(services => {

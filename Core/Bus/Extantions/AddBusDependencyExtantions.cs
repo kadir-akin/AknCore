@@ -13,7 +13,7 @@ namespace Core.Bus.Extantions
 {
     public static class AddBusDependencyExtantions
     {       
-        public static IServiceCollection AddRabbitBus(this IServiceCollection services) 
+        public static IServiceCollection AddRabbitBus(this IServiceCollection services,Action<IServiceCollection> action=null) 
         {
             
             var _configuration = (IConfiguration)services.BuildServiceProvider().GetService(typeof(IConfiguration));
@@ -29,7 +29,11 @@ namespace Core.Bus.Extantions
             var consumeHandlerListType = TypeUtilities.GetAllAssembysTypeFromAssignableInterface(typeof(IConsumeHandler), true);
             var rabbitMqContextList = GetRabbitMqContexts(busMessageListType, consumeHandlerListType, services.BuildServiceProvider());
             services.AddSingleton(typeof(IBusContext), new BusContext(busMessageListType, rabbitMqContextList));
-          
+
+            if (action!=null)
+            {
+                action.Invoke(services);
+            }
             return services;
         }
         public static IServiceCollection RabbitMqPublish<T>(this IServiceCollection services) where T : class, IBusMessage
