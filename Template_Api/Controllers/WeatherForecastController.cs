@@ -4,6 +4,7 @@ using Core.Database.EF.Abstract;
 using Core.Database.Mongo.Abstract;
 using Core.Database.Mongo.Concrate;
 using Core.Elastic.Abstract;
+using Core.Elastic.Concrate;
 using Core.LogAkn.Abstract;
 using Core.LogAkn.Extantions;
 using Core.Security.Abstract;
@@ -35,15 +36,17 @@ namespace Template_Api.Controllers
         private readonly IEfUnitofWork _efUnitOfWork;
         private readonly IMongoExampleRepository _mongoExampleRepository;
         private readonly IMongoUnitOfWork  _mongoUnitOfWork;
-        public WeatherForecastController( ILogService logService, IAknUser aknUser, IEfUnitofWork efUnitOfWork, IMongoExampleRepository mongoExampleRepository, IMongoUnitOfWork mongoUnitOfWork)
+        private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
+        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider)
         {     
-            _logService = logService;
-           _aknUser = aknUser;
+            //_logService = logService;
+          // _aknUser = aknUser;
             //_cacheManager = cacheManager;
             //_rabbitMqProvider = rabbitMqProvider;
-            _efUnitOfWork= efUnitOfWork;
-            _mongoExampleRepository = mongoExampleRepository;
-            _mongoUnitOfWork = mongoUnitOfWork; 
+            //_efUnitOfWork= efUnitOfWork;
+           // _mongoExampleRepository = mongoExampleRepository;
+            //_mongoUnitOfWork = mongoUnitOfWork; 
+            _elasticSearchProvider = elasticSearchProvider;
       
         }
 
@@ -58,27 +61,60 @@ namespace Template_Api.Controllers
         [AknAuthorizationFilter("TESTROLE")]
         public async Task<object> abc([FromBody] TestInputObject test)
         {
-            var stringKey = "BusMessage:Deneme:3939";
+            //var list = Summaries?.Select(x => new ElasticSearchTestobject()
+            //{
+            //    Code = x,
+            //    CreateDate = DateTime.Now,
+            //    Id = Guid.NewGuid().ToString(),
+            //    Message = x
+            //})?.ToList();
 
-            var mongoUnitof = await _mongoUnitOfWork.ExecuteAsync<List<MongoExampleCollection>>(async (x) =>
-             {
-                 var exampleRepository = x.GetRepository<MongoExampleCollection>();
+            // await _elasticSearchProvider.InsertDocuments(list);
 
-                 await exampleRepository.AddAsync(new MongoExampleCollection()
-                 {
-                     FirstName = "Galatasaray 2"
+            //await _elasticSearchProvider.InsertDocument(new ElasticSearchTestobject()
+            //{
+            //    Code = "Bracing verisi",
+            //    CreateDate = DateTime.Now,
+            //    Id = Guid.NewGuid().ToString(),
+            //    Message = "Test Versii",
+            //    Quantity = 8
 
-                 });
-                 if (test.Name == "kadir akın1")
-                 {
-                     int b1 = 0;
-                     int b2 = 3;
-                     int b3 = b2 / b1;
-                 }
+            //});
 
-                 return exampleRepository.Get()?.ToList();
+            var elasticSearchBuilder = new ElasticSearchBuilder();
+            elasticSearchBuilder.SetFrom(0)
+                                .SetSize(11)
+                                .AddRangeFilter(4, 10, "quantity")
+                                .AddTermQuery("Bracing", "code");
+                                 
 
-             });
+
+            var searchResult =await _elasticSearchProvider.SearchAsync(elasticSearchBuilder);
+
+            return searchResult;    
+
+
+            //var stringKey = "BusMessage:Deneme:3939";
+
+            //var mongoUnitof = await _mongoUnitOfWork.ExecuteAsync<List<MongoExampleCollection>>(async (x) =>
+            // {
+            //     var exampleRepository = x.GetRepository<MongoExampleCollection>();
+
+            //     await exampleRepository.AddAsync(new MongoExampleCollection()
+            //     {
+            //         FirstName = "Galatasaray 2"
+
+            //     });
+            //     if (test.Name == "kadir akın1")
+            //     {
+            //         int b1 = 0;
+            //         int b2 = 3;
+            //         int b3 = b2 / b1;
+            //     }
+
+            //     return exampleRepository.Get()?.ToList();
+
+            // });
 
 
             //return mongoUnitof;

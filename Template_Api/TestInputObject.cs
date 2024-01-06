@@ -14,6 +14,11 @@ namespace Template_Api
         public int Id { get; set; }
 
         public string Name { get; set; }
+
+        public int Size { get; set; }
+
+        public int From { get; set; }
+
     }
 
     public class TestOutputObjectValidator : AbstractValidator<TestInputObject>

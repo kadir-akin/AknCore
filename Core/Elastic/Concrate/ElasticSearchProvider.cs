@@ -21,7 +21,7 @@ namespace Core.Elastic.Concrate
             _configuration = configuration;
             _elasticConfiguration = elasticConfiguration;
             _indexName = typeof(Tindex).Name.ToLower();
-            _client = CreateInstance();                      
+            _client = CreateInstance();
         }
 
         private ElasticClient CreateInstance()
@@ -67,13 +67,13 @@ namespace Core.Elastic.Concrate
 
         }
 
-        public async Task InsertDocuments( List<Tindex> products)
+        public async Task InsertDocuments(List<Tindex> products)
         {
             await _client.IndexManyAsync(products, index: _indexName);
         }
 
 
-        public async Task<Tindex> GetDocument( string id)
+        public async Task<Tindex> GetDocument(string id)
         {
             var response = await _client.GetAsync<Tindex>(id, q => q.Index(_indexName));
 
@@ -85,6 +85,28 @@ namespace Core.Elastic.Concrate
         {
             var response = await _client.SearchAsync<Tindex>(q => q.Index(_indexName).Scroll("5m"));
             return response.Documents.ToList();
+        }
+
+        public async Task<ElasticSearchRepsonse<Tindex>> SearchAsync(ElasticSearchBuilder searchBuilder)
+        {
+            var response = await _client.SearchAsync<Tindex>(new SearchRequest(_indexName)
+            {
+                Size = searchBuilder.Size,
+                From = searchBuilder.From,
+                Query = searchBuilder.BuildBoolQuery(),
+
+            });
+
+            return new ElasticSearchRepsonse<Tindex>
+            {
+
+                Documents = response.Documents?.ToList(),
+                Exception = response.OriginalException,
+                IsValid = response.IsValid,
+
+            };
+
+
         }
     }
 }
