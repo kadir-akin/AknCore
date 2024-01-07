@@ -38,7 +38,7 @@ namespace Template_Api.Controllers
         private readonly IMongoExampleRepository _mongoExampleRepository;
         private readonly IMongoUnitOfWork _mongoUnitOfWork;
         private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
-        public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider)
+        public WeatherForecastController()
         {
             //_logService = logService;
             // _aknUser = aknUser;
@@ -47,7 +47,7 @@ namespace Template_Api.Controllers
             //_efUnitOfWork= efUnitOfWork;
             // _mongoExampleRepository = mongoExampleRepository;
             //_mongoUnitOfWork = mongoUnitOfWork; 
-            _elasticSearchProvider = elasticSearchProvider;
+           // _elasticSearchProvider = elasticSearchProvider;
 
         }
 
@@ -121,25 +121,25 @@ namespace Template_Api.Controllers
 
             //await _elasticSearchProvider.InsertDocuments(list);
 
-            var elasticSearchBuilder = new ElasticSearchBuilder();
-            elasticSearchBuilder.SetFrom(0)
-                                .SetSize(11)
-                                .AddRangeFilter(4, 10, "quantity")
-                                .AddTermQuery("25", "code");
+            //var elasticSearchBuilder = new ElasticSearchBuilder();
+            //elasticSearchBuilder.SetFrom(0)
+            //                    .SetSize(11)
+            //                    .AddRangeFilter(4, 10, "quantity")
+            //                    .AddTermQuery("25", "code");
 
 
 
-            var searchResult = await _elasticSearchProvider.SearchAsync(elasticSearchBuilder);
+            //var searchResult = await _elasticSearchProvider.SearchAsync(elasticSearchBuilder);
 
 
-            var suggestResult = await _elasticSearchProvider.SuggestAsync(test.Suggest, 10);
+            //var suggestResult = await _elasticSearchProvider.SuggestAsync(test.Suggest, 10);
 
-            Dictionary<string, object> result = new Dictionary<string, object>();
+            //Dictionary<string, object> result = new Dictionary<string, object>();
 
 
-            result.Add("searchResult", searchResult);
-            result.Add("suggestResult", suggestResult);
-            return result;
+            //result.Add("searchResult", searchResult);
+            //result.Add("suggestResult", suggestResult);
+            //return result;
 
 
             //var stringKey = "BusMessage:Deneme:3939";
