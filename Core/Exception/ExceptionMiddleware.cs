@@ -28,7 +28,7 @@ namespace Core.Exception
             try
             {                
                 await _next(httpContext);
-                
+                logService.LogInformationAsync("");
             }           
             catch (System.Exception ex)
             {
