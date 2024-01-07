@@ -22,6 +22,7 @@ namespace Core.Elastic.Concrate
             _elasticConfiguration = elasticConfiguration;
             _indexName = typeof(Tindex).Name.ToLower();
             _client = CreateInstance();
+            ChekIndex().Wait();
         }
 
         private ElasticClient CreateInstance()
@@ -46,11 +47,16 @@ namespace Core.Elastic.Concrate
             if (anyy.Exists)
                 return;
 
+
             var response = await _client.Indices.CreateAsync(_indexName,
-                ci => ci
-                    .Index(_indexName)
-                    .Settings(s => s.NumberOfShards(3).NumberOfReplicas(1))
-                    );
+                 ci => ci
+                     .Index(_indexName).Map<Tindex>(m => m
+                                .AutoMap()
+                                .Properties(ps => ps
+                                    .Completion(c => c
+                                        .Name(p => p.Suggest))))
+                     .Settings(s => s.NumberOfShards(3).NumberOfReplicas(1))
+                     );
 
             return;
 
@@ -107,6 +113,45 @@ namespace Core.Elastic.Concrate
             };
 
 
+        }
+
+        public async Task<ElasticSearchRepsonse<Tindex>> SuggestAsync(string keyword,int size)
+        {
+            ISearchResponse<Tindex> searchResponse = await _client.SearchAsync<Tindex>(s => s
+                                     .Index(_indexName)
+                                     .Suggest(su => su
+                                          .Completion("suggestions", c => c
+                                               .Field(f => f.Suggest)
+                                               .Prefix(keyword)
+                                               .Fuzzy(f => f
+                                                   .Fuzziness(Fuzziness.Auto)
+                                               )
+                                               .Size(size))
+                                             ));
+
+
+            var suggests = from suggest in searchResponse.Suggest["suggestions"]
+                           from option in suggest.Options
+                           select new ElasticSearchSuggest
+                           {
+                               Id = option.Source.Id,
+                               Input = option.Source.Suggest.Input,
+                               SuggestOutput = option.Source.SuggestOutput,
+                               Text = option.Text,
+                               Score = option.Score
+                           };
+
+            var a = searchResponse.Suggest["suggestions"].Select(x => x.Options);
+
+            return new ElasticSearchRepsonse<Tindex>
+            {
+
+                Documents = searchResponse.Documents?.ToList(),
+                Exception = searchResponse.OriginalException,
+                IsValid = searchResponse.IsValid,
+                SearchSuggests = suggests?.ToList()
+
+            };
         }
     }
 }

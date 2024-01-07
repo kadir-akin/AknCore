@@ -9,5 +9,7 @@ namespace Core.Elastic.Abstract
     {
         [Keyword]
         public string Id { get; set; }
+        public string SuggestOutput { get; set; }
+        public CompletionField Suggest { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using Core.LogAkn.Abstract;
 using Core.RequestContext.Concrate;
 using Core.Security.Abstract;
 using Microsoft.AspNetCore.Http;
+using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +22,14 @@ namespace Core.LogAkn.Concrate
         public int ReturnCode { get; set; }
         public string Message { get; set; }
         public string CreateDate { get; set; }
-        public System.Exception Exception { get; set; }
+        public string StackTrace { get; set; }
         public string ActionPath { get; set; }
         public string LogLevel { get; set; }
         public string Query { get; set; }
         public string Id { get; set; }
-
         public DateTime timestamp { get; set; }
+        public CompletionField Suggest { get; set; }
+        public string SuggestOutput { get; set; }
 
         public RequestContextLog(string message, string logLevel, IHttpContextAccessor httpContext, System.Exception exception, IAknRequestContext requestContext, IAknUser user, ProjectInfoConfiguration projectInfo)
         {
@@ -39,7 +41,7 @@ namespace Core.LogAkn.Concrate
             ReturnCode = httpContext.HttpContext == null ? ((int)HttpStatusCode.OK) : httpContext.HttpContext.Response.StatusCode;
             Message = message;
             CreateDate = DateTime.Now.ToString("yyyy'-'MM'-'dd' 'HH':'mm':'ss");
-            Exception = exception;
+            StackTrace = exception?.StackTrace;
             ActionPath = httpContext.HttpContext != null ? httpContext.HttpContext.Request.Path : null;
             LogLevel = logLevel;
             Query = httpContext.HttpContext != null ? httpContext.HttpContext.Request.QueryString.Value : null;

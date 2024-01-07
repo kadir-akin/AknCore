@@ -24,7 +24,7 @@ namespace Core.LogAkn.Abstract
 
         public string CreateDate { get; set; }
 
-        public System.Exception Exception { get; set; }
+        public string StackTrace { get; set; }
 
         public string ActionPath { get; set; }
 

@@ -19,6 +19,8 @@ namespace Template_Api
 
         public int From { get; set; }
 
+        public string Suggest { get; set; }
+
     }
 
     public class TestOutputObjectValidator : AbstractValidator<TestInputObject>

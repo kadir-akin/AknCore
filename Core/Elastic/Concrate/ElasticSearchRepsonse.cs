@@ -12,6 +12,7 @@ namespace Core.Elastic.Concrate
 
         public List<T> Documents { get; set; }
 
+        public List<ElasticSearchSuggest> SearchSuggests { get; set; }
 
     }
 }

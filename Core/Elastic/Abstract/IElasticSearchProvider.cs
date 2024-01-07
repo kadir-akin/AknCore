@@ -17,5 +17,7 @@ namespace Core.Elastic.Abstract
 
         public Task<ElasticSearchRepsonse<Tindex>> SearchAsync(ElasticSearchBuilder searchBuilder);
 
+        public Task<ElasticSearchRepsonse<Tindex>> SuggestAsync(string keyword, int size);
+
     }
 }

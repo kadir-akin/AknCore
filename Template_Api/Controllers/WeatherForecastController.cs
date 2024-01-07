@@ -5,6 +5,7 @@ using Core.Database.Mongo.Abstract;
 using Core.Database.Mongo.Concrate;
 using Core.Elastic.Abstract;
 using Core.Elastic.Concrate;
+using Core.Elastic.Helper;
 using Core.LogAkn.Abstract;
 using Core.LogAkn.Extantions;
 using Core.Security.Abstract;
@@ -28,26 +29,26 @@ namespace Template_Api.Controllers
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };      
+        };
         private readonly ILogService _logService;
         private readonly IAknUser _aknUser;
         private readonly IRabbitMqProvider<BusMessageTest> _rabbitMqProvider;
         private readonly ICacheManager _cacheManager;
         private readonly IEfUnitofWork _efUnitOfWork;
         private readonly IMongoExampleRepository _mongoExampleRepository;
-        private readonly IMongoUnitOfWork  _mongoUnitOfWork;
+        private readonly IMongoUnitOfWork _mongoUnitOfWork;
         private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
         public WeatherForecastController(IElasticSearchProvider<ElasticSearchTestobject> elasticSearchProvider)
-        {     
+        {
             //_logService = logService;
-          // _aknUser = aknUser;
+            // _aknUser = aknUser;
             //_cacheManager = cacheManager;
             //_rabbitMqProvider = rabbitMqProvider;
             //_efUnitOfWork= efUnitOfWork;
-           // _mongoExampleRepository = mongoExampleRepository;
+            // _mongoExampleRepository = mongoExampleRepository;
             //_mongoUnitOfWork = mongoUnitOfWork; 
             _elasticSearchProvider = elasticSearchProvider;
-      
+
         }
 
 
@@ -61,37 +62,84 @@ namespace Template_Api.Controllers
         [AknAuthorizationFilter("TESTROLE")]
         public async Task<object> abc([FromBody] TestInputObject test)
         {
-            //var list = Summaries?.Select(x => new ElasticSearchTestobject()
+            //var list = new List<ElasticSearchTestobject>();
+            //for (int i = 0; i < 10; i++)
             //{
-            //    Code = x,
-            //    CreateDate = DateTime.Now,
-            //    Id = Guid.NewGuid().ToString(),
-            //    Message = x
-            //})?.ToList();
+            //    var testobject = new ElasticSearchTestobject()
+            //    {
+            //        Code = "code " + i,
+            //        CreateDate = DateTime.Now,
+            //        Id = Guid.NewGuid().ToString(),
+            //        Message = "message + " + i,
+            //        Quantity = i
+            //    };
 
-            // await _elasticSearchProvider.InsertDocuments(list);
+            //    list.Add(testobject);
+            //}
+
 
             //await _elasticSearchProvider.InsertDocument(new ElasticSearchTestobject()
             //{
-            //    Code = "Bracing verisi",
+            //    Code = "Apple Iphone 15 S plus",
             //    CreateDate = DateTime.Now,
             //    Id = Guid.NewGuid().ToString(),
-            //    Message = "Test Versii",
-            //    Quantity = 8
-
+            //    Message = "Apple Iphone 15 S plus",
+            //    Quantity = 15,
+            //    SuggestOutput = "Apple Iphone 15 S plus",
+            //    Suggest = ElasticSearchHelper.ConvertCompletionField(new List<string>
+            //     {
+            //      "Apple","Iphone","15s","15"
+            //     })
             //});
+            //await _elasticSearchProvider.InsertDocument(new ElasticSearchTestobject()
+            //{
+            //    Code = "Galixy 13 plus",
+            //    CreateDate = DateTime.Now,
+            //    Id = Guid.NewGuid().ToString(),
+            //    Message = "Galixy 13 plus",
+            //    SuggestOutput = "Galixy 13 plus",
+            //    Quantity = 15,
+            //    Suggest = ElasticSearchHelper.ConvertCompletionField(new List<string>
+            //     {
+            //      "Galaxy","Galixy 13 plus","Galaxy 13","13"
+            //     })
+            //});
+
+            //await _elasticSearchProvider.InsertDocument(new ElasticSearchTestobject()
+            //{
+            //    Code = "Apple Iphone 13 S plus",
+            //    CreateDate = DateTime.Now,
+            //    Id = Guid.NewGuid().ToString(),
+            //    Message = "Apple Iphone 13 S plus",
+            //    SuggestOutput = "Apple Iphone 13 S plus",
+            //    Quantity = 15,
+            //    Suggest = ElasticSearchHelper.ConvertCompletionField(new List<string>
+            //     {
+            //      "Apple","Iphone","13s","13"
+            //     })
+            //});
+
+            //await _elasticSearchProvider.InsertDocuments(list);
 
             var elasticSearchBuilder = new ElasticSearchBuilder();
             elasticSearchBuilder.SetFrom(0)
                                 .SetSize(11)
                                 .AddRangeFilter(4, 10, "quantity")
-                                .AddTermQuery("Bracing", "code");
-                                 
+                                .AddTermQuery("25", "code");
 
 
-            var searchResult =await _elasticSearchProvider.SearchAsync(elasticSearchBuilder);
 
-            return searchResult;    
+            var searchResult = await _elasticSearchProvider.SearchAsync(elasticSearchBuilder);
+
+
+            var suggestResult = await _elasticSearchProvider.SuggestAsync(test.Suggest, 10);
+
+            Dictionary<string, object> result = new Dictionary<string, object>();
+
+
+            result.Add("searchResult", searchResult);
+            result.Add("suggestResult", suggestResult);
+            return result;
 
 
             //var stringKey = "BusMessage:Deneme:3939";
@@ -185,7 +233,7 @@ namespace Template_Api.Controllers
         [HttpPost]
         public IEnumerable<object> Login([FromBody] TestInputObject test)
         {
-           
+
             return Summaries;
         }
     }
