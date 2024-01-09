@@ -4,6 +4,7 @@ using Core.ResultModel;
 using Core.Security.Abstract;
 using Core.Security.Basic;
 using Core.Security.Concrete;
+using Core.Security.Filter;
 using Core.Security.Jwt;
 using Core.Utilities;
 using Microsoft.AspNetCore.Http;
@@ -39,16 +40,12 @@ namespace Core.Security.Middleware
             AuthenticationResult authenticationResult = new AuthenticationResult(false);
             var path = httpContext.Request.Path.ToString();
             bool isIgnoreEndpoind = false;
-            
-            foreach (var item in _aknUserImplementClasses.IgnoreEndpoindNames)
-            {
-                if (path.Contains(item))
-                {
-                    isIgnoreEndpoind = true;
-                    break;
-                }
-            }
-           
+          
+            var allowAttributes = httpContext?.GetEndpoint()?.Metadata?.GetMetadata<AllowAuthenticationAttribute>();
+            isIgnoreEndpoind= _aknUserImplementClasses.IgnoreEndpoindNames.Any(x=> path.Contains(x));
+
+            if (!isIgnoreEndpoind && allowAttributes != null)
+                isIgnoreEndpoind = true;
 
             if (_basicAuthConfiguration.Value != null && !isIgnoreEndpoind)
             {

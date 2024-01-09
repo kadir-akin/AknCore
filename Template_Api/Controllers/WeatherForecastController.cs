@@ -231,7 +231,8 @@ namespace Template_Api.Controllers
         }
 
         [HttpPost]
-        public IEnumerable<object> Login([FromBody] TestInputObject test)
+        [AllowAuthentication]
+        public IEnumerable<object> Product([FromBody] TestInputObject test)
         {
 
             return Summaries;
