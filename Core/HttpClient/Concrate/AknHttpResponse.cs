@@ -4,38 +4,31 @@ using System.Text;
 
 namespace Core.HttpClient.Concrate
 {
-    public class AknHttpResponse<T> : AknHttpResponse where T:class
+    public class AknHttpResponse<TSuccess,TError> : AknHttpResponse<TError> where TSuccess : class
     {
-        public AknHttpResponse(System.Net.Http.HttpResponseMessage httpResponse,T data,System.Exception ex=null) :base(httpResponse,ex)
+        public AknHttpResponse(System.Net.Http.HttpResponseMessage httpResponse, TSuccess data) :base(httpResponse)
         {
-            Data = data;
+            SuccessData = data;
         }
-
-        public AknHttpResponse(System.Exception ex) :base(ex)
+        public AknHttpResponse(System.Net.Http.HttpResponseMessage httpResponse, TError data) : base(httpResponse)
         {
-            Data = default(T);
+            ErrorData = data;
         }
-        public T Data { get; set; }
+        public TSuccess SuccessData { get; set; }
 
     }
-    public class AknHttpResponse
+    public class AknHttpResponse<TError> 
     {       
-        public AknHttpResponse(System.Net.Http.HttpResponseMessage httpResponse, System.Exception exception=null)
+        public AknHttpResponse(System.Net.Http.HttpResponseMessage httpResponse,TError errorData=default(TError))
         {
             IsSuccess = httpResponse.IsSuccessStatusCode;
             HttpStatusCode = (int)httpResponse.StatusCode;
-            Ex = exception;
+            ErrorData = errorData;
         }
-
-        public AknHttpResponse(System.Exception exception)
-        {
-            IsSuccess = false;
-            HttpStatusCode = 500;
-            Ex = exception;
-        }
+    
         public bool IsSuccess{ get; set; }
         public int HttpStatusCode { get; set; }
-        public System.Exception Ex { get; set; }
+        public TError ErrorData { get; set; }
 
     }
 }

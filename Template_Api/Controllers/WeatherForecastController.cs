@@ -67,7 +67,7 @@ namespace Template_Api.Controllers
         public async Task<object> abc([FromBody] TestInputObject test)
         {
 
-           var result= await _testInternalService.SendAsync<List<TestInternalServiceResponse>>("/posts", HttpMethodType.GET);
+           var result= await _testInternalService.SendAsync<List<TestInternalServiceResponse>,object>("/postskl", HttpMethodType.GET);
 
             return result;
             //var list = new List<ElasticSearchTestobject>();

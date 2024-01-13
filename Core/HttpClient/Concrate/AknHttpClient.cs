@@ -29,7 +29,7 @@ namespace Core.HttpClient.Concrate
 
         }
 
-        public async Task<AknHttpResponse<T>> SendAsync<T>(string prefixUrl, HttpMethodType httpMethodType, HttpContent httpContent = null, Dictionary<string, string> headers = null) where T : class
+        public async Task<AknHttpResponse<TSuccess, TError>> SendAsync<TSuccess, TError>(string prefixUrl, HttpMethodType httpMethodType, HttpContent httpContent = null, Dictionary<string, string> headers = null) where TSuccess : class where TError : class
         {
             var requestUrl = _clientConfig.Value.BaseUrl + prefixUrl;
             try
@@ -50,11 +50,23 @@ namespace Core.HttpClient.Concrate
 
                     using (var resultHttpResponse = await _httpClient.SendAsync(requestMessage))
                     {
-                        using (var stream = await resultHttpResponse.Content.ReadAsStreamAsync())
+                        if (resultHttpResponse.IsSuccessStatusCode)
                         {
-                            var result = await JsonSerializer.DeserializeAsync<T>(stream, _jsonSerliliazeOptions);
-                            return new AknHttpResponse<T>(resultHttpResponse, result);
+                            using (var streamSuccess = await resultHttpResponse.Content.ReadAsStreamAsync())
+                            {
+                                var result = await JsonSerializer.DeserializeAsync<TSuccess>(streamSuccess, _jsonSerliliazeOptions);
+                                return new AknHttpResponse<TSuccess,TError>(resultHttpResponse, result);
+                            }
                         }
+                        else
+                        {
+                            using (var streamError = await resultHttpResponse.Content.ReadAsStreamAsync())
+                            {
+                                var result = await JsonSerializer.DeserializeAsync<TError>(streamError, _jsonSerliliazeOptions);
+                                return new AknHttpResponse<TSuccess, TError>(resultHttpResponse, result);
+                            }
+                        }
+                       
                     }
 
                 }
@@ -68,7 +80,7 @@ namespace Core.HttpClient.Concrate
 
         }
 
-        public async Task<AknHttpResponse> SendAsync(string prefixUrl, HttpMethodType httpMethodType, HttpContent httpContent = null, Dictionary<string, string> headers = null)
+        public async Task<AknHttpResponse<TError>> SendAsync<TError>(string prefixUrl, HttpMethodType httpMethodType, HttpContent httpContent = null, Dictionary<string, string> headers = null) where TError : class
         {
             var requestUrl = _clientConfig.Value.BaseUrl + prefixUrl;
             try
@@ -89,7 +101,19 @@ namespace Core.HttpClient.Concrate
 
                     using (var resultHttpResponse = await _httpClient.SendAsync(requestMessage))
                     {
-                        return new AknHttpResponse(resultHttpResponse);
+                        if (resultHttpResponse.IsSuccessStatusCode)
+                        {
+                            return new AknHttpResponse<TError>(resultHttpResponse);
+                        }
+                        else
+                        {
+                            using (var streamError = await resultHttpResponse.Content.ReadAsStreamAsync())
+                            {
+                                var result = await JsonSerializer.DeserializeAsync<TError>(streamError, _jsonSerliliazeOptions);
+                                return new AknHttpResponse<TError>(resultHttpResponse, result);
+                            }
+                        }
+                       
                     }
 
                 }
