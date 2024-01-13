@@ -26,18 +26,10 @@ namespace Core.Database.Extantions
                         
             services.AddTransient<IMongoClient>(sp => 
             {
-                var client= new MongoClient($"mongodb://{mongoConfig.Value.UserName}:{mongoConfig.Value.Password}@{mongoConfig.Value.Server}?retryWrites=false");
-                //var client = new MongoClient($"mongodb://{mongoConfig.Value.Server}");
+                var client= new MongoClient($"mongodb://{mongoConfig.Value.UserName}:{mongoConfig.Value.Password}@{mongoConfig.Value.Server}?retryWrites=false");           
                 return client;
             });
-
-            services.AddTransient(sp =>
-            {
-                var client = sp.GetService<IMongoClient>();
-                return client.GetDatabase(mongoConfig.Value.Database);
-            });
-
-            services.AddTransient<IMongoSessionFactory, MongoSessionFactory>();
+          
             services.AddScoped<IMongoUnitOfWork, MongoUnitOfWork>();
            
             if (action != null)

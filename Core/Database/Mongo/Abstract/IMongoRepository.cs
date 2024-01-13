@@ -9,7 +9,7 @@ namespace Core.Database.Mongo.Abstract
 {
     public interface IMongoRepository<TCollection> where TCollection : class,IAknMongoCollection
     {
-        IQueryable<TCollection> Get(Expression<Func<TCollection, bool>> predicate = null);
+        Task<List<TCollection>> GetListAsync(Expression<Func<TCollection, bool>> predicate = null);
         Task<TCollection> GetAsync(Expression<Func<TCollection, bool>> predicate);
         Task<TCollection> GetByIdAsync(string id);
         Task<TCollection> AddAsync(TCollection entity);

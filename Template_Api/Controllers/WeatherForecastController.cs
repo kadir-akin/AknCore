@@ -41,17 +41,17 @@ namespace Template_Api.Controllers
         private readonly IMongoUnitOfWork _mongoUnitOfWork;
         private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
         private readonly IAknHttpClient<TestInternalServiceConfiguration> _testInternalService;
-        public WeatherForecastController(IAknHttpClient<TestInternalServiceConfiguration> testInternalService)
+        public WeatherForecastController(IMongoExampleRepository mongoExampleRepository, IMongoUnitOfWork mongoUnitOfWork)
         {
-            _testInternalService = testInternalService;
+            // _testInternalService = testInternalService;
             //_logService = logService;
             // _aknUser = aknUser;
             //_cacheManager = cacheManager;
             //_rabbitMqProvider = rabbitMqProvider;
             //_efUnitOfWork= efUnitOfWork;
-            // _mongoExampleRepository = mongoExampleRepository;
-            //_mongoUnitOfWork = mongoUnitOfWork; 
-           // _elasticSearchProvider = elasticSearchProvider;
+            _mongoExampleRepository = mongoExampleRepository;
+            _mongoUnitOfWork = mongoUnitOfWork;
+            // _elasticSearchProvider = elasticSearchProvider;
 
         }
 
@@ -67,9 +67,9 @@ namespace Template_Api.Controllers
         public async Task<object> abc([FromBody] TestInputObject test)
         {
 
-           var result= await _testInternalService.SendAsync<List<TestInternalServiceResponse>,object>("/postskl", HttpMethodType.GET);
+            //var result= await _testInternalService.SendAsync<List<TestInternalServiceResponse>,object>("/postskl", HttpMethodType.GET);
 
-            return result;
+            // return result;
             //var list = new List<ElasticSearchTestobject>();
             //for (int i = 0; i < 10; i++)
             //{
@@ -152,28 +152,28 @@ namespace Template_Api.Controllers
 
             //var stringKey = "BusMessage:Deneme:3939";
 
-            //var mongoUnitof = await _mongoUnitOfWork.ExecuteAsync<List<MongoExampleCollection>>(async (x) =>
-            // {
-            //     var exampleRepository = x.GetRepository<MongoExampleCollection>();
+            var mongoUnitof = await _mongoUnitOfWork.ExecuteAsync<List<MongoExampleCollection>>(async (x) =>
+             {
+                 var exampleRepository = x.GetRepository<MongoExampleCollection>();
 
-            //     await exampleRepository.AddAsync(new MongoExampleCollection()
-            //     {
-            //         FirstName = "Galatasaray 2"
+                var a = await exampleRepository.AddAsync(new MongoExampleCollection()
+                 {
+                     FirstName = test.Name
 
-            //     });
-            //     if (test.Name == "kadir akın1")
-            //     {
-            //         int b1 = 0;
-            //         int b2 = 3;
-            //         int b3 = b2 / b1;
-            //     }
+                 });
+                 if (test.Name == "kadir akın25")
+                 {
+                     int b1 = 0;
+                     int b2 = 3;
+                     int b3 = b2 / b1;
+                 }
 
-            //     return exampleRepository.Get()?.ToList();
+                 return await exampleRepository.GetListAsync();
 
-            // });
+             });
 
 
-            //return mongoUnitof;
+            return mongoUnitof;
             //   var a =_efUnitOfWork.GetRepository<UserEntity>();
             // var b = await a.GetAsync();
 
@@ -187,8 +187,8 @@ namespace Template_Api.Controllers
             //var resultAddMongo = await _mongoExampleRepository.AddAsync(new MongoExampleCollection()
             //{
 
-            //    FirstName = "Deneme verisi 2",
-            //    Name = "Deneme versii 2",
+            //    FirstName = "Deneme verisi 114",
+            //    Name = "Deneme versii 141",
             //    Age = 15,
             //    CreateDate = DateTime.UtcNow,
             //});

@@ -13,15 +13,13 @@ namespace Core.Database.Mongo.Concrate
     public class MongoUnitOfWork : IMongoUnitOfWork
     {
         private readonly IOptions<MongoConfiguration> _mongoConfig;
-        private readonly IMongoSessionFactory _mongoSessionFactory;
-        private readonly IMongoDatabase _mongoDatabase;
+        private readonly IMongoClient _mongoClient;
         public IClientSessionHandle Session { get; private set; }
         public ConcurrentDictionary<Type, object> Repositorys { get; set; } = new ConcurrentDictionary<Type, object>();
-        public MongoUnitOfWork(IOptions<MongoConfiguration> mongoConfig, IMongoSessionFactory mongoSessionFactory, IMongoDatabase mongoDatabase)
+        public MongoUnitOfWork(IOptions<MongoConfiguration> mongoConfig, IMongoClient mongoClient)
         {
             _mongoConfig = mongoConfig;
-            _mongoSessionFactory = mongoSessionFactory;
-            _mongoDatabase = mongoDatabase;
+            _mongoClient = mongoClient;
 
         }
         public Task CommitTransactionAsync()
@@ -53,7 +51,7 @@ namespace Core.Database.Mongo.Concrate
 
         public async Task StartTransactionAsync()
         {
-            Session = await _mongoSessionFactory.CreateTaskAsync();
+            Session = await _mongoClient.StartSessionAsync();
             Session.StartTransaction();
         }
 
@@ -64,7 +62,7 @@ namespace Core.Database.Mongo.Concrate
                 Repositorys.TryGetValue(typeof(TCollection), out var repository);
                 return (IMongoRepository<TCollection>)repository;
             }
-            var result = new MongoRepository<TCollection>(_mongoConfig, _mongoDatabase, Session);
+            var result = new MongoRepository<TCollection>(_mongoConfig, _mongoClient, Session);
             Repositorys.TryAdd(typeof(TCollection), result);
             return result;
         }

@@ -10,7 +10,7 @@ namespace Template_Api
     }
     public class MongoExampleRepository : MongoRepository<MongoExampleCollection>, IMongoExampleRepository
     {
-        public MongoExampleRepository(IOptions<MongoConfiguration> mongoConfig, IMongoDatabase mongoDatabase) : base(mongoConfig, mongoDatabase)
+        public MongoExampleRepository(IOptions<MongoConfiguration> mongoConfig, IMongoClient  mongoClient) : base(mongoConfig, mongoClient)
         {
         }
     }
@@ -20,7 +20,7 @@ namespace Template_Api
     }
     public class MongoCustomerRepository : MongoRepository<MongoCustomerCollection>, IMongoCustomerRepository
     {
-        public MongoCustomerRepository(IOptions<MongoConfiguration> mongoConfig, IMongoDatabase mongoDatabase) : base(mongoConfig, mongoDatabase)
+        public MongoCustomerRepository(IOptions<MongoConfiguration> mongoConfig, IMongoClient mongoClient) : base(mongoConfig, mongoClient)
         {
         }
     }

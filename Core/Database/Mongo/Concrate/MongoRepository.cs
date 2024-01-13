@@ -16,16 +16,16 @@ namespace Core.Database.Mongo.Concrate
         private readonly IMongoDatabase _mongoDatabase;
         protected readonly IMongoCollection<TCollection> Collection;
         public IClientSessionHandle Session { get; set; }
-        public MongoRepository(IOptions<MongoConfiguration> mongoConfig, IMongoDatabase mongoDatabase)
+        public MongoRepository(IOptions<MongoConfiguration> mongoConfig,IMongoClient mongoClient)
         {
             _mongoConfig = mongoConfig;
-            _mongoDatabase = mongoDatabase;
+            _mongoDatabase = mongoClient.GetDatabase(_mongoConfig.Value.Database);
             this.Collection = _mongoDatabase.GetCollection<TCollection>(typeof(TCollection).Name.ToLowerInvariant());
         }
-        public MongoRepository(IOptions<MongoConfiguration> mongoConfig, IMongoDatabase mongoDatabase, IClientSessionHandle session)
+        public MongoRepository(IOptions<MongoConfiguration> mongoConfig, IMongoClient mongoClient, IClientSessionHandle session)
         {
             _mongoConfig = mongoConfig;
-            _mongoDatabase = mongoDatabase;
+            _mongoDatabase = mongoClient.GetDatabase(_mongoConfig.Value.Database);
             Session = session;
             this.Collection = _mongoDatabase.GetCollection<TCollection>(typeof(TCollection).Name.ToLowerInvariant());
         }
@@ -86,21 +86,47 @@ namespace Core.Database.Mongo.Concrate
            
         }
 
-        public IQueryable<TCollection> Get(Expression<Func<TCollection, bool>> predicate = null)
+        public Task<List<TCollection>> GetListAsync(Expression<Func<TCollection, bool>> predicate = null)
         {
-            return predicate == null
-                 ? Collection.AsQueryable()
-                 : Collection.AsQueryable().Where(predicate);
+            if (Session==null)
+            {
+                return predicate == null
+                ? Collection.Find(Builders<TCollection>.Filter.Empty).ToListAsync()
+                : Collection.Find(predicate).ToListAsync();
+            }
+            else
+            {
+                return predicate == null
+               ? Collection.Find(Session, Builders<TCollection>.Filter.Empty).ToListAsync()
+               : Collection.Find(Session, predicate).ToListAsync();
+            }
+           
         }
 
         public Task<TCollection> GetAsync(Expression<Func<TCollection, bool>> predicate)
         {
-            return Collection.Find(predicate).FirstOrDefaultAsync();
+            if (Session==null)
+            {
+                return Collection.Find(predicate).FirstOrDefaultAsync();
+            }
+            else
+            {
+                return Collection.Find(Session,predicate).FirstOrDefaultAsync();
+            }
+          
         }
 
         public Task<TCollection> GetByIdAsync(string id)
         {
-            return Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            if (Session==null)
+            {
+                return Collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            }
+            else
+            {
+                return Collection.Find(Session,x => x.Id == id).FirstOrDefaultAsync();
+            }
+           
         }
     
         public Task<TCollection> UpdateAsync(TCollection entity, Expression<Func<TCollection, bool>> predicate)
