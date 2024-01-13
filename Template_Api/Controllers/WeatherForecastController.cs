@@ -6,6 +6,8 @@ using Core.Database.Mongo.Concrate;
 using Core.Elastic.Abstract;
 using Core.Elastic.Concrate;
 using Core.Elastic.Helper;
+using Core.HttpClient.Abstract;
+using Core.HttpClient.Concrate;
 using Core.LogAkn.Abstract;
 using Core.LogAkn.Extantions;
 using Core.Security.Abstract;
@@ -38,8 +40,10 @@ namespace Template_Api.Controllers
         private readonly IMongoExampleRepository _mongoExampleRepository;
         private readonly IMongoUnitOfWork _mongoUnitOfWork;
         private readonly IElasticSearchProvider<ElasticSearchTestobject> _elasticSearchProvider;
-        public WeatherForecastController()
+        private readonly IAknHttpClient<TestInternalServiceConfiguration> _testInternalService;
+        public WeatherForecastController(IAknHttpClient<TestInternalServiceConfiguration> testInternalService)
         {
+            _testInternalService = testInternalService;
             //_logService = logService;
             // _aknUser = aknUser;
             //_cacheManager = cacheManager;
@@ -62,6 +66,10 @@ namespace Template_Api.Controllers
         [AknAuthorizationFilter("TESTROLE")]
         public async Task<object> abc([FromBody] TestInputObject test)
         {
+
+           var result= await _testInternalService.SendAsync<List<TestInternalServiceResponse>>("/posts", HttpMethodType.GET);
+
+            return result;
             //var list = new List<ElasticSearchTestobject>();
             //for (int i = 0; i < 10; i++)
             //{

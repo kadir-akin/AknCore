@@ -6,6 +6,7 @@ using Core.Elastic.Abstract;
 using Core.Elastic.Concrate;
 using Core.Elastic.Extantions;
 using Core.Exception.Extantions;
+using Core.HttpClient.Extantions;
 using Core.Infrastructure.Extantions;
 using Core.Localization.Extantions;
 using Core.LogAkn.Abstract;
@@ -70,7 +71,7 @@ namespace Template_Api
                 services.AddSingleton(typeof(IMongoCustomerRepository), typeof(MongoCustomerRepository));
             });
 
-
+            services.AddAknHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -22,6 +22,14 @@ namespace Core.Utilities
                 return assgnableList?.ToList();
         }
 
+        public static List<Type> AllImplementClassWithGenericType(Type interfaceType) 
+        {
+           var result = GetAllAssembyTypes()
+           .Where(item => item.GetInterfaces()
+           .Where(i => i.IsGenericType).Any(i => i.GetGenericTypeDefinition() == interfaceType) && !item.IsAbstract && !item.IsInterface)
+           .ToList();
+            return result;
+        }
         public static TAttribute GetAttributeValueByType<TAttribute>(Type classtype)
         {
             var attributes = classtype.GetCustomAttributes(false)?.Where(x => x.GetType() == typeof(TAttribute))?.FirstOrDefault();

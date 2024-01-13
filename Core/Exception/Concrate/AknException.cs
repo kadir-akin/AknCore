@@ -34,6 +34,11 @@ namespace Core.Exception
            var exceptionDetail = new AknExceptionDetail(ex);
            ExceptionDetailList.Add(exceptionDetail);
         }
-      
+
+        public AknException(System.Exception ex,AknExceptionType exceptionType) : base(ex.Message, ex)
+        {
+            var exceptionDetail = new AknExceptionDetail(ex, exceptionType);
+            ExceptionDetailList.Add(exceptionDetail);
+        }
     }
 }
