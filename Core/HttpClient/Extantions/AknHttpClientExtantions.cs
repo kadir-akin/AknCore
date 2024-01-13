@@ -33,7 +33,6 @@ namespace Core.HttpClient.Extantions
                     var serviceType = typeof(IAknHttpClient<>).MakeGenericType(item);
                     var implementaionType = typeof(AknHttpClient<>).MakeGenericType(item);
                     services.AddHttpClient(serviceType, implementaionType);
-                    //services.AddScoped(serviceType, implementaionType);
                 }                            
             }
 

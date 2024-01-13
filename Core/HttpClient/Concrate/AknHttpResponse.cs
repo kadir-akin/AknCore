@@ -6,16 +6,16 @@ namespace Core.HttpClient.Concrate
 {
     public class AknHttpResponse<T> : AknHttpResponse where T:class
     {
-        public AknHttpResponse(System.Net.Http.HttpResponseMessage httpResponse,T responseModel,System.Exception ex=null) :base(httpResponse,ex)
+        public AknHttpResponse(System.Net.Http.HttpResponseMessage httpResponse,T data,System.Exception ex=null) :base(httpResponse,ex)
         {
-            ResponseModel = responseModel;
+            Data = data;
         }
 
         public AknHttpResponse(System.Exception ex) :base(ex)
         {
-            ResponseModel = default(T);
+            Data = default(T);
         }
-        public T ResponseModel { get; set; }
+        public T Data { get; set; }
 
     }
     public class AknHttpResponse
